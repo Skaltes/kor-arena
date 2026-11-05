@@ -60,6 +60,10 @@ func start(args: PackedStringArray) -> void:
 		elif arg.begins_with("--hit="):
 			_test_dir = arg.trim_prefix("--hit=")
 			_hit_test()
+		elif arg.begins_with("--atk="):
+			var ap := arg.trim_prefix("--atk=").rsplit(":", true, 1)
+			_test_dir = ap[0]
+			_atk_test(ap[1] if ap.size() > 1 else "brute")
 		elif arg == "--audio" or arg.begins_with("--audio="):
 			_audio_test(arg.get_slice("=", 1) if "=" in arg else "brute")
 		elif arg == "--forfeit":
@@ -961,6 +965,41 @@ func _hit_test() -> void:
 		await get_tree().create_timer(2.2).timeout
 	get_tree().quit()
 
+## Normal saldiri kare seridi: --atk=<klasor>:<sinif>. Saldiri baslar baslamaz 0,06 sn arayla 16 kare (4x4).
+func _atk_test(cls: String) -> void:
+	await get_tree().create_timer(0.5).timeout
+	var rng := RandomNumberGenerator.new()
+	m._mode = GameMain.Mode.AI
+	m._begin(Rules.new_character("A", cls, GameMain.TEST_LEVEL, 1, rng), Rules.new_character("B", "warrior", GameMain.TEST_LEVEL, 1, rng), 1, 0)
+	m._brains = []
+	m._foe.atk_t = 9999.0
+	m._me.atk_t = 9999.0
+	for e in m._battle.ents:
+		e.s = e.s.duplicate()
+		e.s["max_hp"] = 9000000.0
+		e.hp = 9000000.0
+	while m._me.pos.distance_to(m._foe.pos) > float(m._me.s["range"]) + 0.1:
+		await get_tree().process_frame
+	await get_tree().create_timer(1.2).timeout
+	var me: CharacterView = m._views[0]
+	m._me.atk_t = 0.05
+	var sheet := Image.create(1800, 1500, false, Image.FORMAT_RGBA8)
+	var t0 := Time.get_ticks_msec()
+	for i in 30:
+		var img: Image = await _shot()
+		img.convert(Image.FORMAT_RGBA8)
+		var c := m._camera.unproject_position(me.global_position + Vector3(0, 1.0, 0))
+		var crop := img.get_region(Rect2i(int(c.x) - 300, int(c.y) - 330, 640, 640).intersection(Rect2i(Vector2i.ZERO, img.get_size())))
+		crop.resize(300, 300)
+		sheet.blit_rect(crop, Rect2i(0, 0, 300, 300), Vector2i((i % 6) * 300, (i / 6) * 300))
+		print("ATK kare %d t=%.2f" % [i, (Time.get_ticks_msec() - t0) * 0.001])
+		if i == 20:
+			m._me.atk_t = 9999.0
+		await get_tree().create_timer(0.06).timeout
+	sheet.save_png(_test_dir.path_join("saldiri_%s.png" % cls))
+	get_tree().quit()
+
+
 ## Ses: gercek macta hangi sesler calindi, muzik degisti mi, ana cikista seviye kac dB.
 func _audio_test(cls := "brute") -> void:
 	var s := SoundBank.me
@@ -1001,6 +1040,10 @@ func _screens_test(phone: bool) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 5
 	await _snap("menu.png", 1.2)
+	for c: String in ["brute", "assassin"]: # menudeki sinif onizlemesi (kullanici ekran goruntusu)
+		m._on_class_changed(c)
+		await _snap("menu_%s.png" % c, 1.5)
+	m._on_class_changed("warrior")
 	var hud := m._hud
 	for shot: Array in [["ayarlar", hud.screens.settings], ["kurallar", hud.screens.help], ["yetenekler", func() -> void: hud.screens.skills("brute", 5)], ["basarimlar", func() -> void: hud.screens.achievements(p)]]:
 		shot[1].call()

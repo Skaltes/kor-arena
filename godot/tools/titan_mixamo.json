@@ -17,6 +17,8 @@
  "T_HitHeavy": "zip:Great Sword Pack/great sword impact (3).fbx",
  "T_Death": "zip:Great Sword Pack/two handed sword death.fbx",
  "T_Victory": "Paladin|Victory 2.fbx",
- "T_Spin": "!zip:Great Sword Pack/great sword high spin attack.fbx",
- "T_Triple": "!zip:Great Sword Pack/great sword slash (2).fbx"
+ "T_Spin": "!zip:Great Sword Pack/great sword casting.fbx",
+ "T_Triple": "!zip:Great Sword Pack/great sword slash (2).fbx",
+ "T_KAttack": "!KevinIglesias-free|paket/Animations/Male/Combat/2H/HumanM@Attack2H01.fbx",
+ "T_KIdle": "KevinIglesias-free|paket/Animations/Male/Combat/2H/HumanM@CombatIdle2H01.fbx"
 }

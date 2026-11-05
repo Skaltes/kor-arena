@@ -18,6 +18,25 @@ for s, t in (("Left", "l"), ("Right", "r")):
     for f, n in (("Thumb", "thumb"), ("Index", "index"), ("Middle", "middle"), ("Ring", "ring"), ("Pinky", "pinky")):
         for i in (1, 2, 3):
             MAP[s + "Hand" + f + str(i)] = "%s_0%d_%s" % (n, i, t)
+# Kevin Iglesias paketleri (B-* iskeleti): Mixamo adindan o iskeletin adina
+KEVIN = {"Hips": "B-hips", "Spine": "B-spine", "Spine2": "B-chest", "Neck": "B-neck", "Head": "B-head"}
+for s_, t_ in (("Left", "L"), ("Right", "R")):
+    KEVIN.update({s_ + "Shoulder": "B-shoulder." + t_, s_ + "Arm": "B-upperArm." + t_, s_ + "ForeArm": "B-forearm." + t_,
+                  s_ + "Hand": "B-hand." + t_, s_ + "UpLeg": "B-thigh." + t_, s_ + "Leg": "B-shin." + t_,
+                  s_ + "Foot": "B-foot." + t_, s_ + "ToeBase": "B-toe." + t_})
+    for f_, n_ in (("Thumb", "thumb"), ("Index", "indexFinger"), ("Middle", "middleFinger"), ("Ring", "ringFinger"), ("Pinky", "pinky")):
+        for i_ in (1, 2, 3):
+            KEVIN[s_ + "Hand" + f_ + str(i_)] = "B-%s0%d.%s" % (n_, i_, t_)
+
+
+def sbone(src, k):
+    # kaynak iskelette Mixamo adi k'nin karsiligi (Mixamo ya da Kevin Iglesias)
+    b = src.pose.bones.get("mixamorig:" + k)
+    if b is None and k in KEVIN:
+        b = src.pose.bones.get(KEVIN[k])
+    return b
+
+
 TRACK = ["hand_r", "hand_l", "foot_r", "foot_l"]
 TRAVEL = 0.25  # bu kadardan fazla yer degistiren hareket yerinde oynatilir
 
@@ -89,7 +108,7 @@ for title, fname in names.items():
     src = next(o for o in new if o.type == "ARMATURE")
     fa, fb = src.animation_data.action.frame_range
     fa, fb = int(fa), int(fb)
-    hips = src.pose.bones["mixamorig:Hips"]
+    hips = sbone(src, "Hips")
     rest_src = src.matrix_world @ hips.bone.matrix_local
     ratio = hip_rest.z / rest_src.translation.z
     s.frame_set(fa)
@@ -107,7 +126,7 @@ for title, fname in names.items():
         bpy.context.view_layer.update()
         hip_now = (src.matrix_world @ hips.matrix).translation
         for k, v in pairs:
-            ps = src.pose.bones.get("mixamorig:" + k)
+            ps = sbone(src, k)
             if ps is None:  # Mixamo'ya yuklenen modelde (eldiven) parmak kemigi olmayabilir: o kemik dinlenmede kalir
                 continue
             q_now = (src.matrix_world @ ps.matrix).decompose()[1]

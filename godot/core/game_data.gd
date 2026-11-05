@@ -85,7 +85,7 @@ const SKILLS: Dictionary = {
 	"judge": {"name": "Yargı Kesiği", "breaks": true, "unlock": 8, "cd": 7, "kind": "melee", "range": 1.9, "mult": 1.9, "windup": 0.65, "push": 0.5, "desc": "Yukarıdan sert bir kesiş, rakibi geri iter."},
 	"boot": {"name": "Sert Tekme", "unlock": 8, "cd": 11, "kind": "melee", "range": 1.6, "mult": 0.7, "windup": 0.45, "push": 0.6, "reel": 0.4, "desc": "Çok hızlı. Rakibi iter, hazırlığını keser ve sarsar."},
 	"rampage": {"name": "Yıkıcı Seri", "breaks": true, "unlock": 8, "cd": 10, "kind": "melee", "range": 1.75, "mult": 1.1, "windup": 0.5, "hits": [0.0, 0.85], "desc": "İki baltayla iki ağır vuruş."},
-	"spin": {"name": "Balyoz Girdabı", "breaks": true, "unlock": 8, "cd": 12, "kind": "aoe_self", "radius": 3.2, "mult": 1.2, "windup": 0.6, "desc": "Balyozu başının üstünde döndürüp tek ağır savuruşla çevresine vurur."},
+	"spin": {"name": "Balyoz Çöküşü", "breaks": true, "unlock": 8, "cd": 12, "kind": "aoe_self", "radius": 3.2, "mult": 1.2, "windup": 0.6, "desc": "Balyozu başının üstüne kaldırıp yere çakar, çevresindekilere tek ağır darbe vurur."},
 	"triple": {"name": "Demir Savuruş", "breaks": true, "unlock": 8, "cd": 14, "kind": "melee", "range": 2.2, "mult": 1.5, "windup": 0.5, "desc": "Balyozu arkadan getirip tek ve çok ağır bir savuruşla vurur."},
 }
 

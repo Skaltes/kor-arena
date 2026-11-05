@@ -1112,6 +1112,8 @@ func _skill_impact(skill: String, e: Battle.Ent, side: float) -> void:
 func _on_aoe(ev: Dictionary) -> void:
 	if ev["skill"] == "quake":
 		SoundBank.me.play("tquake")
+	elif ev["skill"] == "spin": # balyoz yere cakilir
+		SoundBank.me.play("heavy", -3.0, 0.85)
 	var color: Color = SKILL_COLORS[ev["skill"]]
 	_fx.ring(ev["pos"], ev["r"], color, 0.55)
 	_fx.crater(ev["pos"], color, float(ev["r"]) * 0.8)

@@ -82,6 +82,10 @@ func _ready() -> void:
 		var p := AudioStreamPlayer.new()
 		p.bus = "Muzik"
 		p.volume_db = -80.0
+		# Telefon/web: varsayilan "sample" calma muzigi bastan sona acar (savas2 = ~100 MB, telefon donuyor, ses gelmiyordu).
+		# Muzik akarak calinir; kisa efektler sample kalir (gecikmesiz).
+		if OS.has_feature("web"):
+			p.playback_type = AudioServer.PLAYBACK_TYPE_STREAM
 		add_child(p)
 		_deck.append(p)
 	music_volume = Settings.read("ses", "muzik", music_volume)

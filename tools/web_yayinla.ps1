@@ -2,6 +2,7 @@
 # gh-pages dalinda yalnizca son surumun dosyalari durur; her yayinda dal bastan yazilir, boylece depo sismez.
 # GitHub tek dosyada 100 MB'i kabul etmez. Model dokulari PC'de kayipsiz ve buyuk oldugu icin telefon surumu projenin
 # GECICI KOPYASINDAN uretilir: kopyada 3B dokular (modeller, arena, gokyuzu) 1024 piksele indirilip sikistirilir. PC surumu ve asil proje degismez.
+param([switch]$SadeceUret) # -SadeceUret: yalniz Arkadasima-Gonder/web icine uretir, YUKLEMEZ (yerel deneme)
 $ErrorActionPreference = 'Stop'
 $kok = Split-Path $PSScriptRoot -Parent
 $godot = "$kok\araclar\Godot_v4.7.2-stable_win64_console.exe"
@@ -39,6 +40,7 @@ $buyuk = Get-ChildItem $web -File | Where-Object { $_.Length -gt 95MB }
 if ($buyuk) { throw ("GitHub siniri asildi (100 MB): " + (($buyuk | ForEach-Object { "{0} {1:N0} MB" -f $_.Name, ($_.Length / 1MB) }) -join ", ")) }
 "Telefon dosyalari: " + ((Get-ChildItem $web -File | Sort-Object Length -Descending | Select-Object -First 3 | ForEach-Object { "{0} {1:N0} MB" -f $_.Name, ($_.Length / 1MB) }) -join ", ")
 
+if ($SadeceUret) { "URETILDI (yuklenmedi): $web"; return }
 $adres = (& $git -C $kok remote get-url origin)
 Push-Location $web
 $ErrorActionPreference = 'Continue' # git'in satir sonu uyarilari hata sayilmasin; basari cikis koduyla denetlenir

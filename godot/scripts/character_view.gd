@@ -99,7 +99,7 @@ const MX := {
 		"ruin": {"anim": "T_Ruin", "hit": 1.18, "lift": 0.0, "fwd": 0.2},
 		"icearm": {"anim": "P_Wall"}, # buz kalkani kalkan hareketiyle kaldirilir (balyoz gizli)
 		"trample": {"anim": "T_Trample", "hit": 0.6, "start": 0.25, "fwd": 0.0, "knock": 0.12}, # kisa itme: rakip yakininda kalir
-		"spin": {"anim": "T_Spin", "hit": 1.17, "start": 0.55, "end": 1.5}, # basin ustunde dondurup TEK agir savurus (kullanici: agir balyoz art arda vurmaz)
+		"spin": {"anim": "T_Spin", "hit": 2.42, "start": 1.72, "end": 2.95, "fwd": 0.0}, # balyozu basin ustune kaldirip YERE CAKAR (great sword casting; eski 360 derece donus yandan kamerada sirt donuyordu, kullanici: 9 kotu)
 		"triple": {"anim": "T_Triple", "hit": 0.9, "start": 0.4, "end": 1.25, "fwd": 0.0}, # yalniz ilk buyuk savurus: sonraki vuruslar kesildi (kullanici istegi)
 	}},
 }
@@ -730,13 +730,12 @@ func _forearm_mount() -> Transform3D:
 
 ## Sag eldeki tutusun sol ele aynasi: balta kolun degil avucun icinde durur.
 func _mirror_mount() -> Transform3D:
-	var right := _skeleton.get_bone_global_rest(_skeleton.find_bone("hand_r"))
-	var left := _skeleton.get_bone_global_rest(_skeleton.find_bone("hand_l"))
-	var hold := right * Transform3D(Basis.from_euler(HOLD_ROT), HOLD_POS)
-	var flip := Basis.from_scale(Vector3(-1, 1, 1))
-	var basis := flip * hold.basis * Basis.from_scale(Vector3(-1, 1, 1))
-	var origin := flip * hold.origin
-	return left.affine_inverse() * Transform3D(basis, origin)
+	# Sol balta: sag elin tutusunun KEMIK UZAYINDA aynasi (Z ekseni). Eskiden dunya uzayinda ayna aliniyordu; otomatik
+	# oturtulan Berserker iskeletinde sol el sagin aynasi olmadigi icin balta karnin onunde havada kaliyordu, sonra
+	# denenen yumruk-cizgisi yontemi bicagi govdeye ceviriyordu (kullanici: sol balta ters). Bu ayna ile sap yumruktan
+	# gecer, bicak disa bakar, bekleme durusunda balta basi asagida (sol yumrugun hareketteki yonu boyle).
+	var mm := Basis.from_scale(Vector3(1, 1, -1))
+	return Transform3D(mm * Basis.from_euler(HOLD_ROT) * mm, mm * HOLD_POS)
 
 
 func _add_hand_rig(hands: Array, curl: bool, curl_r := false) -> void:
