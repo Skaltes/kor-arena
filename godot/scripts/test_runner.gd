@@ -858,9 +858,9 @@ func _titan_test() -> void:
 			e.fx.clear()
 	m._battle.command({"ent": foe.id, "type": "skill", "skill": "power"})
 	await get_tree().create_timer(0.1).timeout
-	m._battle.command({"ent": me.id, "type": "skill", "skill": "grab"})
-	await _snap("1_kavrama_a.png", 0.4)
-	await _snap("1_kavrama_b.png", 0.3)
+	m._battle.command({"ent": me.id, "type": "skill", "skill": "slam"})
+	await _snap("1_sicrayis_a.png", 0.4)
+	await _snap("1_sicrayis_b.png", 0.3)
 	await get_tree().create_timer(2.5).timeout
 	reset.call()
 	m._battle.command({"ent": me.id, "type": "skill", "skill": "frost"})

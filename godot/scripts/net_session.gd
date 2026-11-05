@@ -16,7 +16,7 @@ signal skill_received(id: String)
 signal ready_received(cls: String)
 signal role_set(is_host: bool) # hizli macta rol lobide belli olur
 
-const VERSION := 18
+const VERSION := 19
 const BROKERS: Array[String] = [
 	"wss://broker.emqx.io:8084/mqtt", # tests/test_broker.gd: 190 ms ve sabit, ama saniyede ~10 mesaj sinir
 	"wss://broker.hivemq.com:8884/mqtt", # sinirsiz ama yogunlukta kuyruk birikir: maclarda saniyelerce gecikme

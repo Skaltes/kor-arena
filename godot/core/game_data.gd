@@ -23,10 +23,10 @@ const CLASSES: Dictionary = {
 	},
 	"brute": {
 		"name": "Titan", "desc": "Ağır balyozuyla yavaş vurur ama her darbesi yıkıcıdır.",
-		"main": "str", "hp_mult": 0.92, "range": 1.9, "aspd": 0.3, "speed": 3.7, "ranged": false, "swing": 1.15, "recover": 1.05,
+		"main": "str", "hp_mult": 0.80, "range": 1.9, "aspd": 0.3, "speed": 3.7, "ranged": false, "swing": 1.15, "recover": 1.05,
 		"base": {"str": 16.5, "agi": 3.0, "int": 3.0, "vit": 14.0},
 		"grow": {"str": 4.8, "agi": 0.5, "int": 0.4, "vit": 4.3},
-		"skills": ["smash", "crush", "quake", "grab", "frost", "ruin", "icearm", "trample", "spin", "triple"], "weapons": ["sledge"],
+		"skills": ["smash", "crush", "quake", "slam", "frost", "ruin", "icearm", "trample", "spin", "triple"], "weapons": ["sledge"],
 		"color": Color(0.55, 0.36, 0.18),
 	},
 }
@@ -74,7 +74,7 @@ const SKILLS: Dictionary = {
 	"smash": {"name": "Balyoz Darbesi", "breaks": true, "unlock": 1, "cd": 4.5, "kind": "melee", "range": 2.2, "mult": 0.85, "windup": 0.75, "desc": "Yavaş ve ağır darbe."},
 	"crush": {"name": "Kemik Kırma", "breaks": true, "unlock": 2, "cd": 7, "kind": "melee", "range": 2.2, "mult": 0.7, "windup": 0.7, "desc": "Orta hızda sert bir darbe."},
 	"quake": {"name": "Yer Sarsıntısı", "unlock": 3, "cd": 10, "kind": "aoe_self", "radius": 3.6, "mult": 1.0, "stun": 0.95, "windup": 0.5, "desc": "Rakibi 0,95 sn sersemletir, hazırlığını keser."},
-	"grab": {"name": "Gırtlak Kavrama", "unlock": 5, "cd": 9, "kind": "melee", "range": 2.2, "mult": 1.0, "windup": 0.45, "grab": true, "stun": 0.6, "push": 1.8, "desc": "Hızlı. Rakip bir yeteneğe HAZIRLANIRKEN basarsan boğazından yakalayıp fırlatır, hazırlığını keser. Hazırlanmıyorsa boşa gider."},
+	"slam": {"name": "Sıçrayış Darbesi", "breaks": true, "unlock": 5, "cd": 12, "kind": "melee", "range": 2.2, "mult": 0.9, "windup": 0.85, "desc": "Sıçrayıp balyozu yukarıdan indirir. Rakibin hazırlığını keser."}, # kullanici: Girtlak Kavrama kaldirildi, yerine Yikimin eski ziplayarak vurma hareketi
 	"frost": {"name": "Buz Mührü", "unlock": 6, "cd": 12, "kind": "melee", "range": 6.6, "mult": 0.35, "windup": 1, "freeze": 2.0, "desc": "Uzun büyü. Rakip hazırlık bitmeden bir yetenekle vurup bozamazsa 2 sn donar: hemen ardından Yıkım yetişir."},
 	"ruin": {"name": "Yıkım", "breaks": true, "down": true, "unlock": 8, "cd": 14, "kind": "melee", "range": 2.2, "mult": 1.8, "windup": 1, "desc": "En uzun hazırlık, en büyük darbe. Kesilebilir!"},
 	"icearm": {"name": "Buz Kolu", "unlock": 7, "cd": 12, "kind": "guard", "windup": 0.15, "dur": 0.8, "counter": true, "freeze": 0.7, "desc": "0,8 sn buzdan bir kalkan kaldırır, tüm hasarı engeller. Rakip bu sırada vurursa donar."},

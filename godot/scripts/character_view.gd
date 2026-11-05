@@ -32,7 +32,7 @@ const MOTIONS := {
 	"smash": {"anim": "Sword_Attack", "hit": 0.4, "move": "overhead", "fwd": 0.4, "stop": 0.16, "knock": 0.45},
 	"crush": {"anim": "Melee_Hook", "hit": 0.25, "move": "side", "fwd": 0.3, "stop": 0.12, "knock": 0.3},
 	"quake": {"anim": "NinjaJump_Land", "hit": 0.07, "move": "ground", "lift": 0.55, "stop": 0.14, "knock": 0.3},
-	"grab": {"anim": "Melee_Hook", "hit": 0.25, "move": "side", "fwd": 0.75, "stop": 0.18, "knock": 0.9},
+	"slam": {"anim": "Sword_Attack", "hit": 0.4, "move": "overhead", "lift": 0.3, "fwd": 0.5, "stop": 0.16, "knock": 0.45},
 	"frost": {"anim": "Spell_Simple_Shoot", "hit": 0.5, "move": "roar", "stop": 0.1, "knock": 0.1},
 	"ruin": {"anim": "Sword_Attack", "hit": 0.4, "move": "charge", "lift": 0.3, "fwd": 0.55, "stop": 0.2, "knock": 0.6},
 	"wall": {"anim": "Sword_Block"},
@@ -90,20 +90,20 @@ const MX := {
 	}},
 	# Titan: iki elli buyuk kilic (Great Sword) ve buyu hareketleri balyoza uyarlandi; SledgeRig kullanilmaz.
 	# lift 0: Mixamo sicrayislari kendi icinde, oyunun ek ziplatmasi gerekmez.
-	"sledge": {"prefix": "T_", "attacks": [{"anim": "T_Attack1", "hit": 0.68, "start": 0.25}], "motions": { # tek duz vurus: yukaridan asagi (kullanici istegi)
-		"smash": {"anim": "T_Smash", "hit": 0.77, "end": 0.8}, # balyozun one ilk inisi vurus: sonraki ikinci savurma kesildi (kullanici istegi)
+	"sledge": {"prefix": "T_", "attacks": [{"anim": "T_KAttack", "hit": 0.62, "start": 0.3, "end": 1.25, "face": true}], "motions": { # tek duz vurus: Kevin Iglesias Attack2H01 (omuz arkasindan basin ustunden patlayan inis, el hizi 12 m/s; dik toparlanir). Eski T_ZAttack vurustan sonra iki buklum kaliyordu (2026-11-06)
+		"smash": {"anim": "T_Smash", "hit": 1.63, "start": 0.3, "end": 1.75, "fwd": 0.0, "face": true}, # Mixamo Two Hand Club Combo: yalniz ilk inis (balyoz 0.7'de tepede, 1.63'te gogus hizasinda); kombonun devami kesildi. Eski slash(4) donuyordu
 		"crush": {"anim": "T_Crush", "hit": 0.9, "fwd": 0.0},
 		"quake": {"anim": "T_Quake", "hit": 1.3, "start": 0.75, "end": 1.42, "lift": 0.0}, # 2H Magic Area Attack 01: balyoz basin ustunden yere iner (eski hareket govdeyi cok egiyordu)
-		"grab": {"anim": "T_Grab", "hit": 0.62, "start": 0.3},
+		"slam": {"anim": "T_Slam", "hit": 1.18, "lift": 0.0, "fwd": 0.2, "face": true}, # great sword jump attack (Yikimin 2026-11-06 oncesi hareketi; vurus ani eski olcum)
 		"frost": {"anim": "T_Frost", "hit": 1.2},
-		"ruin": {"anim": "T_Ruin", "hit": 1.18, "lift": 0.0, "fwd": 0.2},
+		"ruin": {"anim": "T_Ruin", "hit": 1.85, "start": 0.85, "lift": 0.0, "fwd": 0.2, "face": true}, # Mixamo Bash: balyoz 1.47'de basin ustunde, 1.85'te yere iner (eski jump attack donuyordu)
 		"icearm": {"anim": "P_Wall"}, # buz kalkani kalkan hareketiyle kaldirilir (balyoz gizli)
 		"trample": {"anim": "T_Trample", "hit": 0.6, "start": 0.25, "fwd": 0.0, "knock": 0.12}, # kisa itme: rakip yakininda kalir
-		"spin": {"anim": "T_Spin", "hit": 2.42, "start": 1.72, "end": 2.95, "fwd": 0.0}, # balyozu basin ustune kaldirip YERE CAKAR (great sword casting; eski 360 derece donus yandan kamerada sirt donuyordu, kullanici: 9 kotu)
-		"triple": {"anim": "T_Triple", "hit": 0.9, "start": 0.4, "end": 1.25, "fwd": 0.0}, # yalniz ilk buyuk savurus: sonraki vuruslar kesildi (kullanici istegi)
+		"spin": {"anim": "T_Spin", "hit": 1.68, "start": 0.23, "end": 2.2, "fwd": 0.6, "lift": -0.5, "face": true}, # fwd 0.6 (1.0 test sahnesinde rakibin icine giriyordu): kullanici videosunda balyoz kendi ayagina iniyordu, rakibe yetismiyordu; lift -0.5: sicrayis ekrandan cikiyordu # Mixamo Creature 'jump attack': sicrar (balyoz 1.0'da tepede), 1.68'de yere cakar. Eski great sword casting yedekte
+		"triple": {"anim": "T_Triple", "hit": 2.62, "start": 1.1, "end": 2.9, "fwd": 0.0, "face": true}, # Mixamo Heavy Weapon Swing: balyoz arkaya iner (1.1-1.75), tek buyuk yatay savurus, el hizi tepesi 2.57; donus yok
 	}},
 }
-const MX_SLEDGE_GRIP := 0.40 # sag elin sap uzerindeki yeri (sap altindan basa dogru metre): kilic tutusu gibi sag el ustte, sol el altta
+const MX_SLEDGE_GRIP := 0.21 # sag elin sap uzerindeki yeri (sap altindan basa dogru metre): kilic tutusu gibi sag el ustte, sol el altta
 const UPRIGHT := {"brute": 26.0} # dik durus: omurganin geriye acilmasi (derece). Titan hareketlerde ~23 derece one egikti
 const DUAL_AXE_SCALE := 1.08 # Berserker'in el baltalari
 const DARK_WEAPON := {"M_Shield": "M_IronDark", "M_Wood": "M_WoodDark", "M_Bronze": "M_IronDark", "M_Gold": "M_IronDark", "M_Steel": "M_SteelDark", "M_Metal": "M_SteelDark"}
@@ -174,6 +174,7 @@ var _motion := {}
 var _motion_t := -1.0
 var _motion_wind := 0.0
 var _knock := 0.0
+var facing: FacingLock
 var _recoil := 0.0 # hasarda govdenin geriye yatisi (radyan)
 var _recoil_goal := 0.0
 var _twist := 0.0 # vurulan govdenin darbeden uzaga burkulmasi (radyan)
@@ -258,6 +259,8 @@ func setup(ch: Dictionary, battle_ent: Battle.Ent = null) -> void:
 	_ap.add_animation_library("", _library)
 	for n in _model.find_children("*", "MeshInstance3D", true, false):
 		_meshes.append(n)
+	facing = FacingLock.new() # govde dikey eksende donmesin: yandan kamerada sirt donmez (isaretli hareketlerde)
+	_skeleton.add_child(facing)
 	var posture := Posture.new() # dik durus: hareketin one egikligi azaltilir (yay fizigi ustune biner)
 	posture.angle = deg_to_rad(float(UPRIGHT.get(_cls, 0.0)))
 	_skeleton.add_child(posture)
@@ -499,6 +502,8 @@ func _build_trail() -> void:
 ## Vurus sirasinda silah ucunun cizdigi parlak yay
 func _update_trail() -> void:
 	if _action_t <= 0.0:
+		if facing != null:
+			facing.on = false # hareket bitti: yon kilidi yumusakca kapanir
 		_trail_color = Color(1.0, 0.55, 0.15)
 		_trail_width = 0.4
 	var wide := _trail_width >= 0.9 # yetenek: Doom Forge gibi genis, parlak yay (elden ucun otesine)
@@ -759,6 +764,8 @@ func _idle_anim() -> String:
 ## settle > 0: toparlanma tam bu surede biter (duz vurus: savas kodu o ana kadar yetenegi kilitler).
 func _run(m: Dictionary, wind: float, settle := -1.0) -> void:
 	var anim: String = m["anim"]
+	if facing != null:
+		facing.on = m.get("face", false) # yon kilidi yalniz isaretli harekette
 	var length := _ap.get_animation(anim).length
 	_phases.clear()
 	_next_anim = m.get("next", "") if settle <= 0.0 else ""

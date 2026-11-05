@@ -402,34 +402,6 @@ func _new_skill_check() -> bool:
 	return healed and hit and clean
 
 
-## Gırtlak Kavrama: hazirlanan rakibi yakalar, keser, yere serer; hazirlanmayana bosa gider ve tam beklemeye girer.
-func _grab_check() -> bool:
-	var b := _pair("brute", "warrior")
-	b.command({"ent": 0, "type": "skill", "skill": "grab"})
-	var whiffed := false
-	var hurt := 0
-	for i in int(0.6 / Battle.STEP):
-		b.tick()
-		for ev: Dictionary in b.events:
-			whiffed = whiffed or ev["t"] == "whiff"
-			if ev["t"] == "hit" and ev["ent"] == 1:
-				hurt += int(ev["dmg"])
-		b.events.clear()
-	var waits: bool = b.ents[0].cds["grab"] > float(GameData.SKILLS["grab"]["cd"]) * 0.8
-	b.release()
-	var c := _pair("brute", "warrior")
-	c.command({"ent": 1, "type": "skill", "skill": "power"})
-	c.tick()
-	c.command({"ent": 0, "type": "skill", "skill": "grab"})
-	var start: float = c.ents[1].pos.x
-	var thrown := _damage_to(c, 1, 0.75) > 0 and c.has_fx(c.ents[1], "stun")
-	var pushed: float = absf(c.ents[1].pos.x - start) # yerden kalkinca tekrar yuruyecegi icin hemen olculur
-	var safe := _damage_to(c, 0, 1.0) == 0
-	c.release()
-	print("Kavrama: bosa=%s bekleme=%s yakaladi=%s kesti=%s itme=%.2f" % [whiffed, waits, thrown, safe, pushed])
-	return whiffed and hurt == 0 and waits and thrown and safe and pushed > 1.0
-
-
 ## Buz Mührü: bozulmazsa rakip donar ve hicbir sey yapamaz; hazirlikta bir yetenek yerse bozulur.
 func _frost_check() -> bool:
 	var b := _pair("brute", "warrior")
@@ -485,7 +457,7 @@ func _windup_check() -> bool:
 	b.command({"ent": 0, "type": "skill", "skill": "cry"})
 	b.tick()
 	var early := not b.has_fx(b.ents[0], "buff")
-	b.command({"ent": 1, "type": "skill", "skill": "grab"})
+	b.command({"ent": 1, "type": "skill", "skill": "trample"}) # eskiden Girtlak Kavrama (kaldirildi, 0.45 sn); Ezici Hamle de 0.45 sn ve sarsar
 	for i in int(1.0 / Battle.STEP):
 		b.tick()
 	var cut := not b.has_fx(b.ents[0], "buff")
@@ -634,7 +606,7 @@ func _initialize() -> void:
 		"Siper tum hasari keser": _block_check(), "Siper sonu ve bekleme": _guard_end_check(), "Siper ortak beklemeye takilmaz": _guard_gcd_check(),
 		"Gecikme telafisi": _grace_check(), "Yeni yetenekler": _new_skill_check(),
 		"Kisa yol yok": _no_shortcut_check(), "Etkiler sabit": _fixed_effect_check(), "Itme": _push_check(),
-		"Girtlak Kavrama": _grab_check(), "Buz Muhru": _frost_check(), "Buz Kolu": _counter_check(), "Titan kendini guclendirmez": _titan_active_check(), "Hazirliksiz yetenek yok": _windup_check(), "Duz vurus bitmeden yetenek yok": _basic_lock_check()}
+		"Buz Muhru": _frost_check(), "Buz Kolu": _counter_check(), "Titan kendini guclendirmez": _titan_active_check(), "Hazirliksiz yetenek yok": _windup_check(), "Duz vurus bitmeden yetenek yok": _basic_lock_check()}
 	for k: String in checks:
 		print(k, ": ", checks[k])
 		failed = failed or not checks[k]

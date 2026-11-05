@@ -201,8 +201,11 @@ func _weapon_box(i: int) -> Rect2i:
 	if v.rig != null:
 		center = v.rig.weapon.global_position + v.rig.weapon.global_transform.basis.y * 0.5
 		radius = 0.85
-	else:
+	elif v._shield != null:
 		center = v._shield.global_position
+	else: # Mixamo Titan: balyoz sag el yuvasinda (rig yok); sapin ortasi
+		center = v._hand.global_position + v._hand.global_transform.basis.y * 0.6
+		radius = 0.85
 	var cam := _cams[i * 2]
 	var c := cam.unproject_position(center)
 	var r := int(c.distance_to(cam.unproject_position(center + cam.global_transform.basis.x * radius))) + 2

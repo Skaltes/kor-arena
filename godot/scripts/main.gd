@@ -24,7 +24,7 @@ const SNAP_DISTANCE := 2.0 # bundan buyuk farkta karakter dogrudan yerine gecer
 const SKILL_COLORS := {
 	"power": Color(1.0, 0.72, 0.3), "lunge": Color(1.0, 0.9, 0.55), "bash": Color(0.5, 0.75, 1.0), "cry": Color(1.0, 0.55, 0.2), "second": Color(0.4, 1.0, 0.5), "whirl": Color(1.0, 0.8, 0.4),
 	"backstab": Color(0.75, 0.4, 1.0), "hamstring": Color(0.95, 0.3, 0.45), "poison": Color(0.45, 1.0, 0.3), "expose": Color(1.0, 0.3, 0.6), "frenzy": Color(1.0, 0.2, 0.2), "flurry": Color(0.85, 0.5, 1.0),
-	"smash": Color(1.0, 0.6, 0.2), "crush": Color(0.95, 0.9, 0.75), "quake": Color(0.95, 0.55, 0.25), "grab": Color(1.0, 0.5, 0.3), "frost": Color(0.55, 0.85, 1.0), "ruin": Color(1.0, 0.35, 0.05),
+	"smash": Color(1.0, 0.6, 0.2), "crush": Color(0.95, 0.9, 0.75), "quake": Color(0.95, 0.55, 0.25), "slam": Color(1.0, 0.5, 0.3), "frost": Color(0.55, 0.85, 1.0), "ruin": Color(1.0, 0.35, 0.05),
 	"wall": Color(0.6, 0.85, 1.0), "verdict": Color(1.0, 0.92, 0.6), "crossguard": Color(0.6, 0.85, 1.0), "leech": Color(0.9, 0.12, 0.25), "icearm": Color(0.6, 0.9, 1.0), "leap": Color(1.0, 0.85, 0.45), "judge": Color(1.0, 0.95, 0.75), "boot": Color(0.95, 0.6, 0.4), "rampage": Color(1.0, 0.25, 0.3), "spin": Color(1.0, 0.65, 0.3), "triple": Color(0.85, 0.75, 0.6), "trample": Color(0.85, 0.6, 0.35),
 }
 const NET_GRACE := 0.15 # gecikme henuz olculmediyse
@@ -35,7 +35,7 @@ const CAST_CUES := {
 	"backstab": [["blade", -8.0, 1.45]], "hamstring": [["swing", -4.0, 1.55]], "poison": [["dark", -2.0, 1.1]],
 	"expose": [["ring", -4.0, 1.35]], "flurry": [["swing", -2.0, 1.15], ["blade", -9.0, 1.3]], "leech": [["dark", -2.0, 0.85]],
 	"smash": [["troar", -7.0, 1.0]], "crush": [["tthud", -7.0, 1.25]], "quake": [["tguard", -4.0, 0.7]],
-	"grab": [["tswing", -4.0, 0.9]], "frost": [["ice", -3.0, 1.15]], "ruin": [["troar", -2.0, 0.82], ["heavy", -6.0, 0.7]],
+	"slam": [["troar", -6.0, 1.1], ["swing", -4.0, 0.85]], "frost": [["ice", -3.0, 1.15]], "ruin": [["troar", -2.0, 0.82], ["heavy", -6.0, 0.7]],
 	"trample": [["tthud", -4.0, 1.0]],
 	"leap": [["heavy", -6.0, 0.9], ["swing", -4.0, 0.9]], "judge": [["slice", 0.0, 1.0], ["ring", -8.0, 1.1]], "boot": [["low", -5.0, 1.5]],
 	"rampage": [["swing", -2.0, 1.0], ["blade", -9.0, 1.2]], "spin": [["tswing", -2.0, 0.85]], "triple": [["tswing", -3.0, 0.8]],
@@ -1100,7 +1100,7 @@ func _skill_impact(skill: String, e: Battle.Ent, side: float) -> void:
 			_fx.slash(chest, side, color, 2.6)
 			_fx.flash(chest, color, 2.0)
 			_fx.burst(chest, color, 20, 3.0)
-		"grab":
+		"slam":
 			_fx.flash(_at(e.pos, 1.55), color, 2.6)
 			_fx.dust(_at(e.pos, 0.1), 30, 2.4)
 			_fx.ring(e.pos, 1.8, color, 0.45)
