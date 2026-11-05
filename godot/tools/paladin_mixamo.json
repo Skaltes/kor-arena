@@ -1,0 +1,23 @@
+{
+ "P_Idle": "paladin_idle.fbx",
+ "P_Walk": "paladin_walk.fbx",
+ "P_Run": "zip:sword and shield run.fbx",
+ "P_Block": "paladin_block.fbx",
+ "P_Hit": "paladin_hit.fbx",
+ "P_HitHeavy": "paladin_hit_heavy.fbx",
+ "P_Attack1": "zip:sword and shield attack (4).fbx",
+ "P_Attack2": "zip:sword and shield slash.fbx",
+ "P_Power": "zip:sword and shield slash (3).fbx",
+ "P_Lunge": "zip:sword and shield attack (2).fbx",
+ "P_Kick": "zip:sword and shield kick.fbx",
+ "P_Cry": "zip:sword and shield power up.fbx",
+ "P_Second": "Praying.fbx",
+ "P_Wall": "zip:sword and shield block.fbx",
+ "P_Whirl": "zip:sword and shield slash (4).fbx",
+ "P_Verdict": "zip:sword and shield casting.fbx",
+ "P_Death": "zip:sword and shield death.fbx",
+ "P_Victory": "Victory.fbx",
+ "P_Leap": "!zip:sword and shield attack.fbx",
+ "P_Twin": "!zip:sword and shield attack (3).fbx",
+ "P_BlockHit": "zip:sword and shield impact.fbx"
+}

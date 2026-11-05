@@ -1,0 +1,22 @@
+{
+ "B_Idle": "zip:Pro Melee Axe Pack/standing idle.fbx",
+ "B_Walk": "zip:Pro Melee Axe Pack/standing walk forward.fbx",
+ "B_Run": "zip:Pro Melee Axe Pack/standing run forward.fbx",
+ "B_Attack1": "!zip:Pro Melee Axe Pack/standing melee attack horizontal.fbx",
+ "B_Attack2": "!zip:Pro Melee Axe Pack/standing melee attack downward.fbx",
+ "B_Backstab": "!zip:Pro Melee Axe Pack/standing melee attack backhand.fbx",
+ "B_Hamstring": "!zip:Pro Melee Axe Pack/standing melee attack 360 low.fbx",
+ "B_Poison": "!zip:Pro Melee Axe Pack/standing melee combo attack ver. 3.fbx",
+ "B_Expose": "!zip:Pro Melee Axe Pack/standing melee attack 360 high.fbx",
+ "B_Frenzy": "zip:Pro Melee Axe Pack/standing taunt chest thump.fbx",
+ "B_Flurry": "!zip:Pro Melee Axe Pack/standing melee combo attack ver. 2.fbx",
+ "B_Guard": "zip:Pro Melee Axe Pack/standing block idle.fbx",
+ "B_BlockHit": "zip:Pro Melee Axe Pack/standing block react large.fbx",
+ "B_Leech": "!zip:Pro Melee Axe Pack/standing melee run jump attack.fbx",
+ "B_Hit": "zip:Pro Melee Axe Pack/standing react large from left.fbx",
+ "B_HitHeavy": "zip:Pro Melee Axe Pack/standing react large gut.fbx",
+ "B_Death": "Paladin|zip:sword and shield death.fbx",
+ "B_Victory": "zip:Pro Melee Axe Pack/standing taunt battlecry.fbx",
+ "B_Rampage": "!zip:Pro Melee Axe Pack/standing melee combo attack ver. 1.fbx",
+ "B_Kick": "!zip:Pro Melee Axe Pack/standing melee attack kick ver. 1.fbx"
+}

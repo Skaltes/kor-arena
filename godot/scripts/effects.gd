@@ -64,6 +64,42 @@ func burst(pos: Vector3, color: Color, count: int, spread: float, size := 0.05, 
 	_emit(p, life)
 
 
+## Darbe kivilcimi (kullanici: vurus hissi): silah zirha degdiginde kivilcimlar DARBENIN YONUNE cizgi gibi fiskirir,
+## yercekimiyle egilip soner. dir: darbenin gittigi yon (vurandan kurbana), cone: dagilma acisi.
+func sparks(pos: Vector3, dir: Vector3, color: Color, count: int, speed: float) -> void:
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	m.vertex_color_use_as_albedo = true
+	m.albedo_texture = _dot_tex
+	var q := QuadMesh.new()
+	q.size = Vector2(0.035, 0.26) # ince uzun: hiz yonunde cizgi
+	q.material = m
+	var ramp := Gradient.new()
+	ramp.set_color(0, Color(color.r * 4.0, color.g * 4.0, color.b * 3.0, 1.0))
+	ramp.set_color(1, Color(color.r, color.g * 0.35, color.b * 0.2, 0.0))
+	var p := CPUParticles3D.new()
+	p.mesh = q
+	p.amount = count
+	p.lifetime = 0.32
+	p.one_shot = true
+	p.explosiveness = 1.0
+	p.direction = dir.normalized()
+	p.spread = 32.0
+	p.gravity = Vector3(0, -14, 0)
+	p.initial_velocity_min = speed * 0.6
+	p.initial_velocity_max = speed * 1.4
+	p.damping_min = 4.0
+	p.damping_max = 8.0
+	p.particle_flag_align_y = true
+	p.scale_amount_min = 0.6
+	p.scale_amount_max = 1.3
+	p.color_ramp = ramp
+	p.position = pos
+	_emit(p, 0.32)
+
+
 ## Kum tozu: agir vuruslarda yerden kalkar
 func dust(pos: Vector3, amount: int, reach: float) -> void:
 	var ramp := Gradient.new()
@@ -128,6 +164,7 @@ func ring(at: Vector2, radius: float, color: Color, dur := 0.45) -> void:
 	tw.chain().tween_callback(m.queue_free)
 
 
+## Hasar yazisi: buyuk carpar, kuculerek yerine oturur, yukari suzulur.
 func number(pos: Vector3, text: String, color: Color, font_size := 76) -> void:
 	var l := Label3D.new()
 	l.text = text
@@ -136,39 +173,67 @@ func number(pos: Vector3, text: String, color: Color, font_size := 76) -> void:
 	l.font_size = font_size
 	l.outline_size = 18
 	l.outline_modulate = Color(0.06, 0.02, 0.01)
-	l.pixel_size = 0.0042
+	l.pixel_size = 0.0065
 	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	l.no_depth_test = true
-	l.position = pos + Vector3(randf_range(-0.3, 0.3), 0, 0)
+	l.position = pos + Vector3(randf_range(-0.12, 0.12), 0, 0)
 	add_child(l)
+	# Doom Forge gibi: sayi buyuk carpar, iri kalir ve ekranda bir sure okunur
 	var tw := create_tween().set_parallel()
-	tw.tween_property(l, "position:y", pos.y + 0.7, 0.8).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(l, "modulate:a", 0.0, 0.35).set_delay(0.45)
-	tw.tween_property(l, "outline_modulate:a", 0.0, 0.35).set_delay(0.45)
+	tw.tween_property(l, "pixel_size", 0.0056, 0.16).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tw.tween_property(l, "position:y", pos.y + 0.45, 1.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(l, "modulate:a", 0.0, 0.35).set_delay(0.85)
+	tw.tween_property(l, "outline_modulate:a", 0.0, 0.35).set_delay(0.85)
 	tw.chain().tween_callback(l.queue_free)
 
 
 ## Kan: Doom Forge'daki gibi vuruslar kanli ve agirdir. Parcaciklar ustten kararir, parlamaz.
-func blood(pos: Vector3, count: int, spread: float) -> void:
+## side: kan darbenin gittigi yone sicrar.
+## Gercekci kan (kullanici istegi): koyu, mat; uc katman. Ince sis darbe aninda dagilir, damlalar hizlarina gore
+## uzayip cizgi gibi ucar ve yercekimiyle duser, iri pihtilar agir duser. Yere birkac kucuk leke kalir (stain).
+func blood(pos: Vector3, count: int, spread: float, side := 0.0) -> void:
+	var dir := Vector3(side, 0.55, 0.0).normalized()
+	# sis
+	var mist := _blood_particles(pos, count, 0.07, 0.35, dir, 75.0, spread * 0.35, spread * 0.8, -3.0,
+		Color(0.42, 0.02, 0.02, 0.7), Color(0.2, 0.0, 0.0, 0.0))
+	mist.scale_amount_max = 1.8
+	# damlalar: hiz yonune hizali ince cizgiler
+	var drops := _blood_particles(pos, maxi(8, count / 2), 0.0, 0.75, dir, 38.0, spread * 0.7, spread * 1.6, -14.0,
+		Color(0.5, 0.02, 0.02, 1.0), Color(0.22, 0.0, 0.0, 0.85))
+	var streak := QuadMesh.new()
+	streak.size = Vector2(0.028, 0.12)
+	streak.material = (drops.mesh as QuadMesh).material
+	(streak.material as StandardMaterial3D).billboard_mode = BaseMaterial3D.BILLBOARD_DISABLED # yan kameraya donuk, hiz yonune uzanir
+	drops.mesh = streak
+	drops.particle_flag_align_y = true
+	# iri pihtilar
+	_blood_particles(pos, maxi(3, count / 8), 0.075, 0.8, dir, 30.0, spread * 0.4, spread * 0.9, -16.0,
+		Color(0.32, 0.01, 0.01, 1.0), Color(0.18, 0.0, 0.0, 0.9))
+
+
+func _blood_particles(pos: Vector3, amount: int, size: float, life: float, dir: Vector3, cone: float, v_min: float,
+		v_max: float, fall: float, c0: Color, c1: Color) -> CPUParticles3D:
 	var ramp := Gradient.new()
-	ramp.set_color(0, Color(0.75, 0.04, 0.03, 1.0))
-	ramp.set_color(1, Color(0.28, 0.01, 0.01, 0.0))
+	ramp.set_color(0, c0)
+	ramp.set_color(1, c1)
 	var p := CPUParticles3D.new()
-	p.mesh = _quad(0.09, false)
-	p.amount = count
-	p.lifetime = 0.6
+	p.mesh = _quad(maxf(size, 0.05), false)
+	(p.mesh.material as StandardMaterial3D).albedo_texture = _dot_tex if size > 0.0 else null
+	p.amount = amount
+	p.lifetime = life
 	p.one_shot = true
-	p.explosiveness = 0.92
-	p.spread = 70.0
-	p.direction = Vector3.UP
-	p.gravity = Vector3(0, -11, 0)
-	p.initial_velocity_min = spread * 0.5
-	p.initial_velocity_max = spread * 1.5
+	p.explosiveness = 0.95
+	p.direction = dir
+	p.spread = cone
+	p.gravity = Vector3(0, fall, 0)
+	p.initial_velocity_min = v_min
+	p.initial_velocity_max = v_max
 	p.scale_amount_min = 0.5
-	p.scale_amount_max = 1.4
+	p.scale_amount_max = 1.3
 	p.color_ramp = ramp
 	p.position = pos
-	_emit(p, 0.6)
+	_emit(p, life)
+	return p
 
 
 ## Yere damlayan kan: mac boyunca kalir, sayisi sinirli.

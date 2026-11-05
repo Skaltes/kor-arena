@@ -1,6 +1,7 @@
 class_name ArenaView
 extends Node3D
-## Doom Forge atmosferinde karanlik, seyircisiz Roma amfisi: mavi golgeler, ates isigi, kan, zincirler.
+## Doom Forge atmosferinde karanlik, seyircisiz Roma amfisi: mavi golgeler, kor isigi, kan. Sade (kullanici istegi):
+## zincir, diken, mizrak, sutun parcalari ve alev parcaciklari kaldirildi; mangallarda yalniz parlayan kor ve sicak isik.
 ## Kamera amfinin icinde durur, her sey arkadadir; hicbir parca hareket etmez.
 
 const CENTER := Vector3(0, 0, 10) # amfi halkalarinin merkezi
@@ -22,7 +23,6 @@ func _ready() -> void:
 	_build_seats()
 	_build_arcade()
 	_build_war_props()
-	_build_chains()
 	_build_fires()
 
 
@@ -93,6 +93,14 @@ func _build_environment() -> void:
 	fill.light_energy = 1.3
 	fill.omni_range = 9.0
 	add_child(fill)
+
+	# Arkadan soguk kenar isigi: koyu zirhlar karanlik duvardan ayrilir, silueti okunur
+	var rim := OmniLight3D.new()
+	rim.position = Vector3(0, 2.6, -2.2)
+	rim.light_color = Color(0.45, 0.62, 1.0)
+	rim.light_energy = 2.2
+	rim.omni_range = 5.5
+	add_child(rim)
 
 ## Poly Haven CC0 tas dokusu. Doku dunya olcegine gore dosenir; uzun duvarda esnemez.
 func _pbr(tex: String, world_scale: float, tint := Color.WHITE) -> StandardMaterial3D:
@@ -307,7 +315,6 @@ func _build_war_props() -> void:
 		var a := atan2(x, CENTER.z - z)
 		_mesh(_box(Vector3(1.5, 1.55, 0.04)), red, Vector3(x, 1.15, z), false).rotation.y = -a
 		_mesh(_box(Vector3(1.6, 0.08, 0.06)), gold, Vector3(x, 1.95, z), false).rotation.y = -a
-		_mesh(_box(Vector3(0.48, 0.48, 0.06)), gold, Vector3(x, 1.2, z + 0.01), false).rotation = Vector3(0, -a, PI / 4.0)
 
 	# Duvara asili kalkanlar
 	var bronze := _color_mat(Color(0.62, 0.38, 0.16), 0.35, 0.85)
@@ -319,116 +326,18 @@ func _build_war_props() -> void:
 		var boss := _mesh(_cyl(0.13, 0.13, 0.14, 12), bronze, Vector3(x, 1.25, z + 0.05))
 		boss.rotation.x = PI / 2.0
 
-	# Kumda kalmis mizraklar, yikik sutun ve demir mangal
-	var wood := _color_mat(Color(0.32, 0.2, 0.11))
-	var iron := _color_mat(Color(0.3, 0.3, 0.33), 0.4, 0.85)
-	for s: Array in [[-6.4, -3.4, 0.28], [-6.0, -4.1, -0.2], [6.3, -3.6, -0.3]]:
-		var pivot := Node3D.new()
-		pivot.position = Vector3(s[0], 0, s[1])
-		pivot.rotation.z = s[2]
-		add_child(pivot)
-		var shaft := MeshInstance3D.new()
-		shaft.mesh = _cyl(0.03, 0.03, 2.4, 8)
-		shaft.material_override = wood
-		shaft.position.y = 1.2
-		pivot.add_child(shaft)
-		var tip := MeshInstance3D.new()
-		tip.mesh = _cyl(0.0, 0.08, 0.34, 6)
-		tip.material_override = iron
-		tip.position.y = 2.55
-		pivot.add_child(tip)
-	var marble := _pbr("marble", 0.7, Color(0.9, 0.85, 0.76))
-	_mesh(_cyl(0.48, 0.55, 1.5, 14), marble, Vector3(7.4, 0.75, -5.2))
-	var fallen := _mesh(_cyl(0.5, 0.5, 2.2, 14), marble, Vector3(-7.8, 0.48, -5.4))
-	fallen.rotation = Vector3(0, 0.5, PI / 2.0)
-	var bowl := _mesh(_cyl(0.5, 0.2, 0.3, 14), iron, Vector3(4.6, 1.35, -6.2))
-	_mesh(_cyl(0.05, 0.1, 1.2, 8), iron, Vector3(4.6, 0.6, -6.2))
-	var coal := _color_mat(Color(0.1, 0.05, 0.04))
-	coal.emission_enabled = true
-	coal.emission = Color(1.0, 0.36, 0.08)
-	coal.emission_energy_multiplier = 3.0
-	_mesh(_cyl(0.45, 0.45, 0.04, 14), coal, bowl.position + Vector3(0, 0.15, 0), false)
 
-
-## Arka plandan sarkan agir zincirler: Doom Forge arenasinin imzasi
-func _build_chains() -> void:
-	var link := TorusMesh.new()
-	link.inner_radius = 0.07
-	link.outer_radius = 0.13
-	link.rings = 10
-	link.ring_segments = 6
-	var iron := _color_mat(Color(0.09, 0.09, 0.11), 0.45, 0.9)
-	for line: Array in [[Vector3(-8.5, 7.5, -9.0), Vector3(-3.2, 2.0, -7.6)], [Vector3(8.0, 7.5, -9.0), Vector3(3.6, 1.9, -7.6)], [Vector3(-5.5, 7.5, -9.5), Vector3(-1.0, 3.4, -9.0)]]:
-		var a: Vector3 = line[0]
-		var b: Vector3 = line[1]
-		var count := int(a.distance_to(b) / 0.2)
-		var along := (b - a).normalized()
-		var side := along.cross(Vector3.BACK).normalized()
-		var mm := MultiMesh.new()
-		mm.transform_format = MultiMesh.TRANSFORM_3D
-		mm.mesh = link
-		mm.instance_count = count
-		for i in count:
-			var t := float(i) / count
-			var sag := sin(t * PI) * 0.7
-			var pos := a.lerp(b, t) + Vector3.DOWN * sag
-			var flat := Basis(side, along.cross(side).normalized(), along)
-			var b2: Basis = flat if i % 2 == 0 else flat.rotated(along, PI / 2.0)
-			mm.set_instance_transform(i, Transform3D(b2.rotated(side, PI / 2.0), pos))
-		var n := MultiMeshInstance3D.new()
-		n.multimesh = mm
-		n.material_override = iron
-		add_child(n)
-	# Duvar dibindeki demir dikenler
-	var spike := _cyl(0.0, 0.07, 0.6, 6)
-	for i in 21:
-		var x := -9.0 + i * 0.9
-		_mesh(spike, iron, Vector3(x, 0.3, _on_wall(x, 0.8)))
-
-
-func _fire(pos: Vector3, size: float) -> void:
-	var grad := Gradient.new()
-	grad.set_color(0, Color(1, 1, 1, 1))
-	grad.set_color(1, Color(1, 1, 1, 0))
-	var tex := GradientTexture2D.new()
-	tex.gradient = grad
-	tex.fill = GradientTexture2D.FILL_RADIAL
-	tex.fill_from = Vector2(0.5, 0.5)
-	tex.fill_to = Vector2(1.0, 0.5)
-	var mat := StandardMaterial3D.new()
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	mat.vertex_color_use_as_albedo = true
-	mat.albedo_texture = tex
-	var quad := QuadMesh.new()
-	quad.size = Vector2.ONE * 0.5 * size
-	quad.material = mat
-	var ramp := Gradient.new()
-	ramp.set_color(0, Color(3.0, 1.9, 0.6, 1.0))
-	ramp.set_color(1, Color(1.2, 0.2, 0.02, 0.0))
-	var p := CPUParticles3D.new()
-	p.mesh = quad
-	p.amount = 22
-	p.lifetime = 0.7
-	p.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-	p.emission_sphere_radius = 0.16 * size
-	p.direction = Vector3.UP
-	p.spread = 12.0
-	p.gravity = Vector3(0, 1.2, 0)
-	p.initial_velocity_min = 0.7 * size
-	p.initial_velocity_max = 1.3 * size
-	p.color_ramp = ramp
-	p.preprocess = 1.0
-	p.fixed_fps = 30
-	p.use_fixed_seed = true
-	p.seed = 3
-	p.speed_scale = 0.0 # alev donuk bir goruntudur: arka plan hareket etmez
-	p.position = pos
-	add_child(p)
+## Kor: alev yerine mangalda duragan parlayan kor yuzeyi ve sicak isik (telefon cizimi parlak alevi beyaz kare yapiyordu).
+## coals false: yalniz isik (duvar lambalari).
+func _fire(pos: Vector3, size: float, coals := true) -> void:
+	if coals:
+		var coal := _color_mat(Color(0.12, 0.04, 0.02))
+		coal.emission_enabled = true
+		coal.emission = Color(1.0, 0.38, 0.1)
+		coal.emission_energy_multiplier = 2.2
+		_mesh(_cyl(0.44, 0.44, 0.04, 16), coal, pos, false)
 	var l := OmniLight3D.new()
-	l.position = pos + Vector3(0, 0.3, 0.6)
+	l.position = pos + Vector3(0, 0.5, 0.6)
 	l.light_color = Color(1.0, 0.5, 0.2)
 	l.light_energy = 2.4 * size
 	l.omni_range = 9.0
@@ -441,9 +350,9 @@ func _build_fires() -> void:
 		var base := Vector3(x, 0.0, -5.2)
 		_mesh(_cyl(0.06, 0.13, 1.5, 8), iron, base + Vector3(0, 0.75, 0))
 		_mesh(_cyl(0.5, 0.22, 0.32, 12), iron, base + Vector3(0, 1.6, 0))
-		_fire(base + Vector3(0, 1.9, 0), 1.3)
+		_fire(base + Vector3(0, 1.77, 0), 1.3)
 	for x: float in [-10.5, 10.5]:
-		_fire(Vector3(x, 2.6, _on_wall(x, 0.5)), 0.9)
+		_fire(Vector3(x, 2.6, _on_wall(x, 0.5)), 0.9, false)
 
 ## Zayif bilgisayarda en pahali iki efekt kapanir, oyun gorunumu bozulmadan akici kalir.
 func set_low_quality() -> void:
@@ -451,3 +360,12 @@ func set_low_quality() -> void:
 	_env.glow_enabled = false
 	get_viewport().msaa_3d = Viewport.MSAA_DISABLED
 	get_viewport().scaling_3d_scale = 0.8
+	if Version.phone(): # telefonun piksel sayisi ne olursa olsun yuk ayni kalsin; web cizimi renkleri zaten daha doygun gosterir
+		var side: int = get_window().size[get_window().size.max_axis_index()]
+		get_viewport().scaling_3d_scale = minf(1280.0 / side, 1.0)
+		_env.adjustment_saturation = 1.0
+		_env.adjustment_contrast = 1.0
+		# Gercek zamanli golgeler telefonda ucgen yukunu ~3 katina cikariyordu (ay isigi iki parca + spot). Telefonda kapanir,
+		# karakterlerin altinda ucuz leke golgesi durur (CharacterView._build_blob). PC degismez.
+		for l: Light3D in find_children("*", "Light3D", true, false):
+			l.shadow_enabled = false

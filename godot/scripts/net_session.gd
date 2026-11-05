@@ -14,25 +14,36 @@ signal state_received(data: PackedFloat32Array)
 signal events_received(list: Array)
 signal skill_received(id: String)
 signal ready_received(cls: String)
+signal role_set(is_host: bool) # hizli macta rol lobide belli olur
 
-const VERSION := 8
+const VERSION := 18
 const BROKERS: Array[String] = [
-	"wss://broker.emqx.io:8084/mqtt",
-	"wss://broker.hivemq.com:8884/mqtt",
+	"wss://broker.emqx.io:8084/mqtt", # tests/test_broker.gd: 190 ms ve sabit, ama saniyede ~10 mesaj sinir
+	"wss://broker.hivemq.com:8884/mqtt", # sinirsiz ama yogunlukta kuyruk birikir: maclarda saniyelerce gecikme
 	"wss://test.mosquitto.org:8081",
 ]
 const CODE_LETTERS := "ABCDEFGHJKLMNPQRSTUVWXYZ23456789" # karisan 0/O ve 1/I yok
 const TOPIC := "korarena/v2/%s/%s"
 const CONNECT_TIMEOUT := 6.0
 const ROOM_TIMEOUT := 12.0
+const LOBBY_TOPIC := "korarena/v2/lobi/%d" # bekleyen odalar burada kodunu duyurur
+const LOBBY_LOOK := 4.0 # ilan duymak icin beklenen sure
+const LOBBY_RETRY := 15.0 # yedek sunucuda bekleyen oda ana sunucuyu yeniden dener
+const LOBBY_RENEW := 1.5 # sunucu mesaj dusurebilir ve saklamaz: ilan surekli tekrarlanir
 const SILENCE_LIMIT := 8.0
-const FLUSH_EVERY := 0.1 # saniyede en cok 10 paket: sunucuyu bogmamak icin
+const FLUSH_EVERY := 0.125 # saniyede 8 durum paketi: sunucu siniri asilirsa mesajlar kuyruga girer ya da duser
+const MIN_GAP := 0.1 # yetenek ve olaylar siradaki paketi one alir ama iki paket arasi bundan kisa olmaz
 const MAX_IN_PACKET := 12
+const MAX_RATE := 9 # herkese acik sunucu saniyede ~10 mesajdan sonra baglantiyi yavaslatiyor (olcum: 11-13/sn gidince
+# gidis-donus 145 -> 400 ms, 0,4-0,9 sn bosluklar): her mesaj bu butceye girer
+const ACK_EVERY := 0.25 # katilan tarafin yalnizca onay iceren paketi bu siklikta gider
 
-enum Role { NONE, HOST, CLIENT }
+enum Role { NONE, HOST, CLIENT, SEEK }
 
 var room_code := ""
 var rtt_ms := -1 # son olculen gidis-donus gecikmesi
+var peak_rate := 0 # olcum: 1 sn icinde yollanan en cok mesaj (sunucu siniri ~10)
+var _sent_at: Array[int] = [] # son 1 sn icinde yollanan mesajlarin zamani (butce)
 
 var _ws: WebSocketPeer
 var _role := Role.NONE
@@ -54,19 +65,65 @@ var _out_first := 0
 var _in_next := 0
 var _ack_due := false
 var _state := PackedFloat32Array()
+var _advertise := false # hizli macta oda ilani acik
+var _quick_join := false # ilandan katilindi: oda yoksa yeniden aranir
+var _quick_hello: Array = []
+var _renew := 0.0
+
+
+## Hizli mac: ilan duyarsa o odaya katilir, duymazsa oda acip ilan verir.
+func quick(player_name: String, cls: String) -> void:
+	close()
+	_quick_hello = [player_name, cls]
+	_role = Role.SEEK
+	_broker = 0
+	_open()
+
+
+func _publish_ad(text: String) -> void:
+	_publish(LOBBY_TOPIC % VERSION, text.to_utf8_buffer())
+
+
+## Iki oyuncu ayni anda oda acarsa ilani kucuk kodlu olan kalir, oburu ona katilir.
+func _on_ad(payload: PackedByteArray) -> void:
+	var code := payload.get_string_from_utf8()
+	var mine := CODE_LETTERS[_broker] + room_code
+	if code.length() != 6 or code == mine or (_role == Role.HOST and mine < code):
+		return
+	role_set.emit(false)
+	var hello := _quick_hello
+	if join(code, hello[0], hello[1]):
+		_quick_join = true
+		_quick_hello = hello
+
+
+func _host_quick() -> void:
+	var hello := _quick_hello
+	role_set.emit(true)
+	close()
+	_role = Role.HOST
+	_new_room()
+	_broker = 0
+	_open()
+	_quick_hello = hello
+	_advertise = true
 
 
 func host() -> bool:
 	close()
 	_role = Role.HOST
+	_new_room()
+	_broker = 0
+	_open()
+	return true
+
+
+func _new_room() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	room_code = ""
 	for i in 5:
 		room_code += CODE_LETTERS[rng.randi_range(0, CODE_LETTERS.length() - 1)]
-	_broker = 0
-	_open()
-	return true
 
 
 func join(code: String, player_name: String, cls: String) -> bool:
@@ -87,6 +144,8 @@ func join(code: String, player_name: String, cls: String) -> bool:
 func close() -> void:
 	if _online:
 		_send("bye", [])
+	_advertise = false
+	_quick_join = false
 	if _ws != null:
 		_ws.close()
 	_ws = null
@@ -116,13 +175,13 @@ func _open() -> void:
 
 ## Oda sahibi calisan ilk sunucuyu bulur; kod hangi sunucuda oldugunu da tasir.
 func _next_broker() -> void:
-	if _role == Role.HOST and _broker + 1 < BROKERS.size():
+	if _role != Role.CLIENT and _broker + 1 < BROKERS.size():
 		_broker += 1
 		_open()
 		return
 	var role := _role
 	close()
-	failed.emit("Sunucuya bağlanılamadı. İnternetini kontrol edip tekrar dene." if role == Role.HOST else "Odaya bağlanılamadı. Kodu kontrol edip tekrar dene.")
+	failed.emit("Sunucuya bağlanılamadı. İnternetini kontrol edip tekrar dene." if role != Role.CLIENT else "Odaya bağlanılamadı. Kodu kontrol edip tekrar dene.")
 
 
 func _process(delta: float) -> void:
@@ -159,26 +218,52 @@ func _process(delta: float) -> void:
 
 func _tick_session(delta: float) -> void:
 	_beat += delta
+	if _role == Role.SEEK:
+		if _wait > LOBBY_LOOK:
+			_host_quick()
+		return
+	if _advertise and not _matched:
+		if _broker != 0 and _wait > LOBBY_RETRY: # ana sunucu gecici dustuyse rakip orada olabilir
+			_host_quick()
+			return
+		_renew += delta
+		if _renew > LOBBY_RENEW:
+			_renew = 0.0
+			_publish_ad(CODE_LETTERS[_broker] + room_code)
 	if _role == Role.CLIENT and not _matched:
 		if _wait > ROOM_TIMEOUT:
+			var again := _quick_join
+			var hello := _quick_hello
 			close()
-			failed.emit("Oda bulunamadı. Kodu ve arkadaşının odayı açık tuttuğunu kontrol et.")
+			if again:
+				quick(hello[0], hello[1])
+			else:
+				failed.emit("Oda bulunamadı. Kodu ve arkadaşının odayı açık tuttuğunu kontrol et.")
 		elif _beat > 1.0:
 			_beat = 0.0
 			_send("hello", [_client_id] + _hello)
 		return
 	if not _matched:
 		return
-	if _beat > 1.0:
+	if _beat > 1.0 and _budget() < MAX_RATE: # 8 durum paketi + 1 ping
 		_beat = 0.0
 		_send("ping", [Time.get_ticks_msec()])
 	_flush += delta
-	if _flush >= FLUSH_EVERY:
+	var only_ack := _outbox.is_empty() and _state.is_empty()
+	if _flush >= (ACK_EVERY if only_ack and _role == Role.CLIENT else FLUSH_EVERY) and _budget() < MAX_RATE:
 		_flush = 0.0
 		_send_packet()
 	_silence += delta
 	if _silence > SILENCE_LIMIT:
 		_lost()
+
+
+## Son 1 saniyede yollanan mesaj sayisi.
+func _budget() -> int:
+	var now := Time.get_ticks_msec()
+	while not _sent_at.is_empty() and _sent_at[0] < now - 1000:
+		_sent_at.pop_front()
+	return _sent_at.size()
 
 
 func _lost() -> void:
@@ -223,6 +308,11 @@ func _subscribe(topic: String) -> void:
 
 
 func _publish(topic: String, payload: PackedByteArray) -> void:
+	var now := Time.get_ticks_msec()
+	_sent_at.append(now)
+	while _sent_at[0] < now - 1000:
+		_sent_at.pop_front()
+	peak_rate = maxi(peak_rate, _sent_at.size())
 	var body := _text(topic)
 	body.append_array(payload)
 	_ws.send(_frame(0x30, body))
@@ -251,7 +341,11 @@ func _read_packets() -> void:
 			_on_connack(body)
 		elif kind == 0x30:
 			var skip := 2 + (body[0] << 8 | body[1])
-			_on_message(body.slice(skip))
+			if body.slice(2, skip).get_string_from_utf8() == LOBBY_TOPIC % VERSION:
+				if _role == Role.SEEK or _advertise:
+					_on_ad(body.slice(skip))
+			else:
+				_on_message(body.slice(skip))
 		if _ws == null:
 			return
 
@@ -264,9 +358,15 @@ func _on_connack(body: PackedByteArray) -> void:
 	_wait = 0.0
 	_beat = 2.0
 	_silence = 0.0
+	if _role == Role.SEEK:
+		_subscribe(LOBBY_TOPIC % VERSION)
+		return
 	_subscribe(TOPIC % [room_code, "c2h" if _role == Role.HOST else "h2c"])
 	if _role == Role.HOST:
 		status.emit("ODA KODU: %s%s" % [CODE_LETTERS[_broker], room_code])
+		if _advertise:
+			_renew = LOBBY_RENEW
+			_subscribe(LOBBY_TOPIC % VERSION)
 
 
 func _send(kind: String, args: Array) -> void:
@@ -287,6 +387,7 @@ func _on_message(payload: PackedByteArray) -> void:
 				if _rival_id == "":
 					_rival_id = a[0]
 					_matched = true
+					_advertise = false
 					joined.emit(String(a[2]).left(16), a[3])
 		"pack":
 			if a.size() == 4 and a[0] is int and a[1] is int and a[2] is Array:
@@ -362,10 +463,12 @@ func send_state(data: PackedFloat32Array) -> void:
 
 func send_events(list: Array) -> void:
 	_reliable("events", list)
+	_flush = maxf(_flush, FLUSH_EVERY - MIN_GAP)
 
 
 func send_skill(id: String) -> void:
 	_reliable("skill", id)
+	_flush = maxf(_flush, FLUSH_EVERY - MIN_GAP)
 
 
 func send_ready(cls: String) -> void:

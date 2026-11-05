@@ -1,0 +1,16 @@
+Kor Arena ses dosyalari. Tumu CC0 (kamu mali), atif zorunlu degil. Kaynaklar burada iz surulsun diye yazildi.
+Efektlerin bir kismi kirpildi, seviyesi esitlendi, katmanlandi veya alcaltildi.
+
+Muzik
+- music/savas1.ogg: Determined Pursuit (emmama) https://opengameart.org/content/determined-pursuit-epic-orchestra-loop
+- music/savas2.ogg: War Theme ver 2 (spring-spring) https://opengameart.org/content/war-theme
+- music/menu.ogg: Unexplored short ver (tad) https://opengameart.org/content/unexplored-short-ver-orchestra-music
+
+Efekt
+- sfx/blade, sfx/clash: 20 Sword Sound Effects (starninjas) https://opengameart.org/content/20-sword-sound-effects-attacks-and-clashes
+- sfx/click: RPG Sound Pack (artisticdude) https://opengameart.org/content/rpg-sound-pack
+- sfx/blade: 50 RPG Sound Effects (Kenney) https://opengameart.org/content/50-rpg-sound-effects- sfx/thit: Impact Sounds (Kenney) https://kenney.nl/assets/impact-sounds , katmanlandi ve kalinlastirildi
+
+sfx/body1-3.ogg: bu proje icin FFmpeg ile uretildi.
+
+sfx/level1.ogg, sfx/coin1.ogg, sfx/loot1.ogg: bu proje icin FFmpeg ile uretildi (sentez).

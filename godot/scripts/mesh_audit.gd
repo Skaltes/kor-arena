@@ -92,11 +92,11 @@ static func _depth(p: Vector3, kind: String) -> float:
 				best = maxf(best, minf(0.215 - absf(p.x), minf(0.09 - absf(p.y - 1.0), 0.1 - absf(p.z))))
 			return best
 		"shield":
-			var disc := Vector2(p.x, p.y).length()
+			var disc := Vector2(p.x, p.z).length() # kalkan yuzeyi Y eksenine bakar
 			if disc >= 0.33:
 				return 0.0
 			var half := 0.09 * sqrt(1.0 - disc * disc / 0.1089)
-			return maxf(0.0, minf(half - absf(p.z), 0.33 - disc))
+			return maxf(0.0, minf(half - absf(p.y), 0.33 - disc))
 		"axe":
 			var best := 0.0
 			if p.y > -0.15 and p.y < 0.63 and r < 0.024:

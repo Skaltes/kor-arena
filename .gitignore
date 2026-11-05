@@ -1,0 +1,25 @@
+# Programlar ve uretilen oyun dosyalari
+araclar/
+Arkadasima-Gonder/
+*.exe
+*.zip
+*.pck
+
+# Test ciktilari ve arsiv
+kontrol-goruntuleri/
+eski-tarayici-surumu/
+
+# Godot onbellegi
+godot/.godot/
+
+# Mixamo ham dosyalari dagitilamaz
+mixamo-hazirlik/
+mixamo-animasyon/
+godot/assets/mixamo/
+
+# Sonniss sesleri ham ses olarak dagitilamaz (lisans); sesler yalniz oyunun icinde yayinlanir
+godot/assets/audio/sfx/
+# Sketchfab modelleri ve dokulari buyuk; lisans dosyalari yerelde (assets/sketchfab/*_LISANS.txt)
+godot/assets/sketchfab/
+# gecici test dosyalari
+godot/tests/_*

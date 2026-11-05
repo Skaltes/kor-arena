@@ -5,6 +5,7 @@ extends Control
 const GAME := "res://scenes/main.tscn"
 const CHECK_TIMEOUT := 6.0
 const ZIP_PATH := "user://guncelleme.zip"
+const PHONE_UI := 1.4 # kucuk ekranda arayuz parmakla basilacak boyda olsun
 
 var _http: HTTPRequest
 var _text: Label
@@ -32,6 +33,14 @@ func _ready() -> void:
 	_bar.visible = false
 	box.add_child(_bar)
 
+	if Version.phone():
+		get_window().content_scale_factor = PHONE_UI
+	if OS.get_cmdline_user_args().is_empty(): # gelistirici testleri pencere boyunu kendisi secer
+		Settings.apply_window()
+	# Web surumunde guncelleme yok: sayfa her acilista son yayini getirir
+	if OS.has_feature("web"):
+		_start_game.call_deferred()
+		return
 	var exe := OS.get_executable_path()
 	if FileAccess.file_exists(exe + ".eski"):
 		DirAccess.remove_absolute(exe + ".eski")

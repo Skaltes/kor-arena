@@ -16,6 +16,14 @@ const RECIPES := {
 	"M_Bone": {"tex": "marble", "tint": Color(0.92, 0.86, 0.72), "metal": 0.0, "rough": 0.6, "uv": 1.0},
 	"M_Wood": {"tex": "wood", "tint": Color(0.75, 0.55, 0.4), "metal": 0.0, "rough": 0.8, "uv": 1.0},
 	"M_Shield": {"tex": "wood", "tint": Color(0.75, 0.2, 0.15), "metal": 0.0, "rough": 0.6, "uv": 1.5},
+	# Sketchfab zirhlarinin yaninda: koyu demir ve is kararmis ahsap (kullanici: kirmizi kalkan, turuncu sap goze batiyor)
+	"M_IronDark": {"tex": "metal", "tint": Color(0.5, 0.51, 0.55), "metal": 1.0, "rough": 0.45, "uv": 2.0},
+	"M_WoodDark": {"tex": "wood", "tint": Color(0.3, 0.22, 0.17), "metal": 0.0, "rough": 0.85, "uv": 1.0},
+	"M_SteelDark": {"tex": "metal", "tint": Color(0.7, 0.72, 0.76), "metal": 1.0, "rough": 0.32, "uv": 1.0},
+	# Berserker baltasi (kullanici: "gorunumu kotu"): ayna gibi celik karanlik arenayi yansitip DUZ SIYAH gorunuyordu.
+	# Dovme celik: daha az ayna, doku ve isik okunur; sap deri sarili.
+	"M_AxeSteel": {"tex": "metal", "tint": Color(1.35, 1.35, 1.4), "metal": 0.45, "rough": 0.36, "uv": 2.5},
+	"M_AxeGrip": {"tex": "leather", "tint": Color(0.55, 0.38, 0.28), "metal": 0.0, "rough": 0.7, "uv": 3.0},
 }
 
 static var _cache := {}

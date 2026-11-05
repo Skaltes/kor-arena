@@ -1,0 +1,30 @@
+Sonniss GDC 2026 Game Audio Bundle (sonniss.com/gameaudiogdc) - ucretsiz paket.
+Lisans (paketteki "License - GDC Game Audio.pdf" ozeti): ticari ve ticari olmayan projelerde sinirsiz kullanim,
+isim/atif gerekmez. Sesler ham ses dosyasi olarak (ses kutuphanesi gibi) yeniden dagitilamaz, satilamaz;
+yapay zeka egitiminde kullanilamaz. Oyunun icinde kullanmak serbesttir.
+
+Kullanilan dosyalar (assets/audio/sfx, kesildi, seviyelendi, ogg yapildi):
+- scut1-6   : 344 Audio - Historical Weapons Vol. 2 (WEAPSwrd Sword Slide Cuts, Metallic, Impact)
+- punch1-4  : 344 Audio - Cinematic Fight Vol. 1 (FGHTImpt 4 x Punch, Body)
+- punch5    : Epic Stock Media - Anime Game (FGHTImpt Combat Punch Impact)
+- hthud1-4  : David Dumais Audio - Melee Weapons Pack 2 (SWSH Swing Impacts Heavy Weapon To Thud)
+- mhit1     : David Dumais Audio - Melee Weapons Pack 2 (METLImpt Metal Swing Hit)
+- gore1     : Epic Stock Media - Halloween Game (GORESplt Heavy Impact Smash)
+- splat1    : Epic Stock Media - Tower Defense Game (WOODImpt Hit Blood Spill Splat)
+- slice1    : Epic Stock Media - Tower Defense Game (DSGNStngr Sword Slice Special Move)
+- ice1      : Epic Stock Media - Tower Defense Game (ICEBrk Skill Freeze Whoosh Break Impact)
+- ice2      : Alexander Kopeikin - 100 kHz Designed Ice (ice, crack, ice block snapping)
+- swing1    : 344 Audio - Elemental Palette Designed Vol. 1 (WINDDsgn Wind, Rush, Whoosh)
+- swing2    : Cinematic Sound Design - Colossal Impacts (Woosh Debris)
+- swing3    : Epic Stock Media - Tower Defense Game (DSGNStngr Sword Slice Swish)
+- tswing1   : 344 Audio - Elemental Palette Designed Vol. 1 (METLMisc Metal, Slow Whoosh)
+- tswing2   : Epic Stock Media - Elemental Mutation Whooshes and Impacts (FIREWhsh Whoosh Fire Deep Growl)
+- holy1     : Epic Stock Media - Fantasy Game 2 (MAGAngl Magic Light Spell Enchantment)
+- dark1-2   : Alexander Kopeikin - Emotion and Magic (magic, action gesture, evil presence, onslaught)
+- troar1    : Epic Stock Media - Humanoid Creatures Vol 4 (CREAHmn Designed Orc Male Attack)
+- tquake1, low1, heavy1 : Federico Soler - Effective Trailer Booms Vol. 2 (011, 075, 214)
+- heavy2    : Cinematic Sound Design - Colossal Impacts (Impact Cut Sweep)
+- tguard1   : The Noisery - Moaning Metal (DSGNImpt Metal Hit Thud Thump Low Ring)
+- tthud1    : 344 Audio - Haunting Ambiences Vol. 3 (WOODImpt Wooden Hit, Dark, Heavy Hit)
+- ring1     : Epic Stock Media - HD Game Materials (METLImpt Metal Old File Impact Tap)
+(Eski RPG paketi swing/tswing/cast/troar/tquake/tguard/low/heavy/tthud/ring sesleri ve sswing1 kaldirildi: kullanici "kapi gicirtisi" dedi.)

@@ -1,0 +1,20 @@
+{
+ "height": 1.0,
+ "base": {
+  "hips": "pelvis", "spine": "spine_01", "chest": "spine_03", "neck": "neck_01", "head": "Head",
+  "L_shoulder": "clavicle_l", "L_arm": "upperarm_l", "L_elbow": "lowerarm_l", "L_wrist": "hand_l",
+  "L_thumb1": "thumb_01_l", "L_thumb2": "thumb_02_l", "L_thumb3": "thumb_03_l",
+  "L_point1": "index_01_l", "L_point2": "index_02_l", "L_point3": "index_03_l",
+  "L_middle1": "middle_01_l", "L_middle2": "middle_02_l", "L_middle3": "middle_03_l",
+  "L_ring1": "ring_01_l", "L_ring2": "ring_02_l", "L_ring3": "ring_03_l",
+  "L_pink1": "pinky_01_l", "L_pink2": "pinky_02_l", "L_pink3": "pinky_03_l",
+  "R_shoulder": "clavicle_r", "R_arm": "upperarm_r", "R_elbow": "lowerarm_r", "R_wrist": "hand_r",
+  "R_thumb1": "thumb_01_r", "R_thumb2": "thumb_02_r", "R_thumb3": "thumb_03_r",
+  "R_point1": "index_01_r", "R_point2": "index_02_r", "R_point3": "index_03_r",
+  "R_middle1": "middle_01_r", "R_middle2": "middle_02_r", "R_middle3": "middle_03_r",
+  "R_ring1": "ring_01_r", "R_ring2": "ring_02_r", "R_ring3": "ring_03_r",
+  "R_pink1": "pinky_01_r", "R_pink2": "pinky_02_r", "R_pink3": "pinky_03_r",
+  "L_leg": "thigh_l", "L_knee": "calf_l", "L_ankle": "foot_l", "L_foot": "ball_l",
+  "R_leg": "thigh_r", "R_knee": "calf_r", "R_ankle": "foot_r", "R_foot": "ball_r"
+ }
+}

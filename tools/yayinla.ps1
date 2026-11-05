@@ -24,4 +24,5 @@ if (Test-Path "$dis\KorArena.zip") { Remove-Item -LiteralPath "$dis\KorArena.zip
 Compress-Archive -LiteralPath "$dis\KorArena.exe" -DestinationPath "$dis\KorArena.zip"
 [IO.File]::WriteAllText("$dis\surum.txt", "$yeni", $utf8)
 & $gh release create "v$yeni" "$dis\KorArena.exe" "$dis\KorArena.zip" "$dis\surum.txt" --repo $repo --title "Kor Arena $yeni" --notes $Not --latest
+& "$PSScriptRoot\web_yayinla.ps1"
 "YAYINLANDI: surum $yeni"

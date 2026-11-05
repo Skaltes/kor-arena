@@ -1,0 +1,13 @@
+{
+ "remove": ["Object_2"],
+ "head_top_mesh": "Object_3",
+ "arm_mesh": "Object_5",
+ "allow": {
+  "Object_3": ["Head", "neck_01"],
+  "Object_8": ["Head", "neck_01"],
+  "Object_4": ["pelvis", "spine_01", "thigh", "calf", "foot", "ball"],
+  "Object_5": ["clavicle", "upperarm", "lowerarm", "hand", "thumb", "index", "middle", "ring", "pinky"],
+  "Object_7": ["spine_01", "spine_02", "spine_03", "neck_01", "clavicle", "upperarm"],
+  "Object_6": ["pelvis", "spine", "neck_01", "Head", "thigh", "calf", "foot", "ball", "clavicle", "upperarm"]
+ }
+}

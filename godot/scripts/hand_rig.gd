@@ -9,6 +9,7 @@ const TURN_SPEED := 9.0
 ## [kemik adi, silah ekseni kemik uzayinda]
 var hands: Array = []
 var curl_left := false
+var curl_right := false # Titan: balyozun sapini sag avuc da kavrar
 
 var _bones: Array[Array] = [] # [kemik, eksen, donus orani]
 var _body: Array[Array] = []
@@ -25,15 +26,20 @@ func _ready() -> void:
 	for leg: String in ["l", "r"]:
 		_body.append([sk.find_bone("thigh_" + leg), sk.find_bone("calf_" + leg), 0.15])
 		_body.append([sk.find_bone("calf_" + leg), sk.find_bone("foot_" + leg), 0.12])
-	if not curl_left:
-		return
-	var rest := sk.get_bone_global_rest(sk.find_bone("hand_l"))
-	var f := (sk.get_bone_global_rest(sk.find_bone("middle_01_l")).origin - rest.origin).normalized()
+	for side: String in (['l'] if curl_left else []) + (['r'] if curl_right else []):
+		_curl_side(sk, side)
+
+
+func _curl_side(sk: Skeleton3D, side: String) -> void:
+	var rest := sk.get_bone_global_rest(sk.find_bone("hand_" + side))
+	var f := (sk.get_bone_global_rest(sk.find_bone("middle_01_" + side)).origin - rest.origin).normalized()
 	var palm := (Vector3.DOWN - f * Vector3.DOWN.dot(f)).normalized()
 	var axis := f.cross(palm).normalized()
 	for finger: String in ["index", "middle", "ring", "pinky"]:
 		for joint in range(1, 4):
-			var bone := sk.find_bone("%s_0%d_l" % [finger, joint])
+			var bone := sk.find_bone("%s_0%d_%s" % [finger, joint, side])
+			if bone < 0: # bazi modellerde parmak az (ornegin tek parca parmaklar)
+				continue
 			_curls.append([bone, Quaternion((sk.get_bone_global_rest(bone).basis.inverse() * axis).normalized(), 1.0 if joint == 1 else 1.25)])
 
 

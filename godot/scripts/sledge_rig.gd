@@ -25,8 +25,9 @@ const LOW_BACK := [Vector3(-0.04, -0.36, 0.26), Vector3(-0.16, -0.5, -0.85), 0.2
 const HIGH_BACK := [Vector3(0.0, 0.32, 0.22), Vector3(0.0, 0.58, -0.81), -0.42]
 const PLANT := [Vector3(0.1, -0.1, 0.32), Vector3(0.1, -0.9, 0.42), 0.1]
 const ABOVE := [Vector3(0.0, 0.3, 0.06), Vector3(0.98, 0.14, 0.1), -0.25]
-## Hareket adi: [hazirligin yuzde kacinda, poz, yaklasma hizi] sirali anahtarlar. -1 = silahin inisi: isabetten STRIKE once.
-const STRIKE := 0.11
+## Hareket adi: [hazirligin yuzde kacinda, poz, yaklasma hizi] sirali anahtarlar. -1 = silahin inisi: isabetten STRIKE once baslar,
+## hizi inis suresine gore ayarlanir (balyoz son anda aniden hizlanmaz, inisi gorulur).
+const STRIKE := 0.6 # inis hazirligin bu orani kadar surer (en az 0.2, en cok 0.7 sn)
 const MOVES := {
 	"overhead": [[0.0, RAISED, 7.0], [-1.0, SLAM, 34.0], [1.25, IDLE, 4.0]],
 	"side": [[0.0, WIDE_BACK, 7.0], [-1.0, WIDE_FRONT, 34.0], [1.3, IDLE, 4.0]],
@@ -37,7 +38,7 @@ const MOVES := {
 }
 var weapon: Node3D
 var released := false # olumde kollar serbest kalir
-var frozen := false # isabet duraklamasi
+var speed := 1.0 # isabet duraklamasi: 0,08 donma, sonra yavas cikis (CharacterView._impact_scale)
 var flip := false # sagdaki savasci: pozlar aynalanir, balyoz yine rakibe bakar
 var worst_gap := 0.0 # test icin: avuc ile sap arasinda gorulen en buyuk mesafe
 
@@ -55,6 +56,8 @@ var _move: Array = []
 var _t := -1.0
 var _impact := 0.0
 var _total := 0.0
+var _key := -1 # yumusak egriyle kurulan anahtar
+var _from: Array = [] # o anahtar baslarken balyozun durusu
 
 
 func _ready() -> void:
@@ -91,6 +94,7 @@ func _ready() -> void:
 func play(move: String, impact: float, total: float) -> void:
 	_move = MOVES[move]
 	_t = 0.0
+	_key = -1
 	_impact = maxf(impact, 0.2)
 	_total = total
 
@@ -104,18 +108,28 @@ func cancel() -> void:
 	_t = -1.0
 
 
+## [poz, yaklasma hizi, anahtar no, anahtar basi, sure]. Sure > 0 ise poz o surede yumusak egriyle (yavas-hizli-yavas) kurulur.
 func _wanted() -> Array:
 	if _t < 0.0:
-		return [IDLE, 7.0]
-	var found: Array = _move[0]
+		return [IDLE, 7.0, -1, 0.0, 0.0]
+	var strike := clampf(_impact * STRIKE, 0.2, 0.7)
+	var times: Array[float] = []
 	for key: Array in _move:
-		var at: float = _impact - STRIKE if float(key[0]) < 0.0 else float(key[0]) * _impact
-		if _t >= at:
-			found = key
-	return [found[1], found[2]]
+		times.append(_impact - strike if float(key[0]) < 0.0 else float(key[0]) * _impact)
+	var i := 0
+	for k in times.size():
+		if _t >= times[k]:
+			i = k
+	var found: Array = _move[i]
+	if float(found[0]) < 0.0:
+		return [found[1], 0.0, i, times[i], strike] # inis tam isabet aninda biter
+	if i + 1 < times.size() and times[i] < _impact:
+		# hazirlik pozu bir sonraki anahtara kadar kurulur: kalkip beklemez, surekli hareket eder
+		return [found[1], 0.0, i, times[i], times[i + 1] - times[i]]
+	return [found[1], found[2], -1, 0.0, 0.0]
 
 func _process_modification_with_delta(step: float) -> void:
-	var delta := step * (0.08 if frozen else 1.0)
+	var delta := step * speed
 	var sk := get_skeleton()
 	if sk == null or _chest < 0 or weapon == null:
 		return
@@ -128,11 +142,22 @@ func _process_modification_with_delta(step: float) -> void:
 			_t = -1.0
 	var w: Array = _wanted()
 	var pose: Array = w[0]
-	var k := 1.0 - exp(-delta * float(w[1]))
 	var mirror := Vector3(-1.0 if flip else 1.0, 1.0, 1.0)
-	_center = _center.lerp(pose[0] * mirror, k)
-	_dir = _dir.lerp(pose[1] * mirror, k).normalized()
-	_lean = lerpf(_lean, pose[2], k)
+	if float(w[4]) > 0.0:
+		if int(w[2]) != _key:
+			_key = w[2]
+			_from = [_center, _dir, _lean]
+		var u := clampf((_t - float(w[3])) / float(w[4]), 0.0, 1.0)
+		var e := u * u * (3.0 - 2.0 * u)
+		_center = (_from[0] as Vector3).lerp(pose[0] * mirror, e)
+		_dir = (_from[1] as Vector3).lerp(pose[1] * mirror, e).normalized()
+		_lean = lerpf(_from[2], pose[2], e)
+	else:
+		_key = -1
+		var k := 1.0 - exp(-delta * float(w[1]))
+		_center = _center.lerp(pose[0] * mirror, k)
+		_dir = _dir.lerp(pose[1] * mirror, k).normalized()
+		_lean = lerpf(_lean, pose[2], k)
 	for bone in _spine: # govde de vurusa katilir
 		var g := sk.get_bone_global_pose(bone)
 		g.basis = Basis(Vector3.RIGHT, _lean * SPINE_LEAN) * g.basis

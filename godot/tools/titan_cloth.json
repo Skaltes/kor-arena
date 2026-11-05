@@ -1,0 +1,4 @@
+{"pieces": [
+ {"object": "Object_8", "island": 0, "name": "on", "joints": 3},
+ {"object": "Object_8", "island": 1, "name": "palto", "joints": 3, "split": "angle4"}
+]}
