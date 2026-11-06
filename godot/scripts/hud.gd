@@ -12,6 +12,7 @@ signal skill_pressed(id: String)
 signal rematch
 signal forfeit
 signal pause_pressed
+signal restart_pressed # aninda yeniden baslatma (R tusu / duraklatma menusu)
 signal character_closed
 signal quick_match(cls: String, player_name: String)
 signal bot_match
@@ -352,7 +353,7 @@ func _volume_row(text: String, music: bool) -> Control:
 	return row
 
 
-const STAT_HINTS := {"main": "saldırı", "agi": "kritik, hız", "vit": "can, savunma"}
+const STAT_HINTS := {"main": "saldırı", "agi": "saldırı hızı", "vit": "can, savunma"}
 
 
 ## Karakter ekrani: stat puani, giyilenler ve demirci, canta ve sandik. Her islem aninda kaydedilir.
@@ -369,7 +370,7 @@ func show_character() -> void:
 	stats.custom_minimum_size.x = 290
 	stats.add_child(_small("%s · Sv. %d" % [c["name"], profile.level], 26, GOLD))
 	stats.add_child(_small("Güç Puanı %d" % Rules.score(ch), 18, GOLD))
-	stats.add_child(_small("Can %d · Saldırı %d\nSavunma %d · Kritik %%%d" % [s["max_hp"], s["atk"], s["def"], s["crit"]], 16))
+	stats.add_child(_small("Can %d · Saldırı %d\nSavunma %d" % [s["max_hp"], s["atk"], s["def"]], 16)) # kritik yok (kullanici karari)
 	stats.add_child(_small("Dağıtılacak puan: %d" % profile.points, 17, GOLD))
 	var names := {"main": "Güç", "agi": "Çeviklik", "vit": "Dayanıklılık"}
 	if c["main"] == "agi":
@@ -811,6 +812,9 @@ func show_battle(me: Battle.Ent, foe: Battle.Ent, vs_ai: bool) -> void:
 		var menu := _button("Menü", 15)
 		menu.pressed.connect(func() -> void: screens.online_menu(me.ch["cls"]))
 		_anchored(menu, Control.PRESET_BOTTOM_LEFT, Vector2(14, -12))
+		var pause := _button("Duraklat", 15) # canli macta da (kullanici istegi): ikisinde birden durur
+		pause.pressed.connect(func() -> void: pause_pressed.emit())
+		_anchored(pause, Control.PRESET_BOTTOM_RIGHT, Vector2(-14, -12))
 
 
 ## Test Modu ayarlari: her dugme adini gosterir, basinca main yeni adlari yollar.
@@ -828,7 +832,7 @@ func show_test_panel(items: Dictionary) -> void:
 	_test_box = v
 
 
-func show_pause(on: bool, testing := false) -> void:
+func show_pause(on: bool, testing := false, who := "") -> void:
 	if _pause_box != null and is_instance_valid(_pause_box):
 		_pause_box.queue_free()
 	if not on:
@@ -837,9 +841,13 @@ func show_pause(on: bool, testing := false) -> void:
 	v.add_theme_constant_override("separation", 12)
 	v.custom_minimum_size.x = 340
 	v.add_child(_label("DURAKLATILDI", 34, GOLD, true))
+	if who != "": # canli mac: kimin durdurdugu; iki taraf da devam ettirebilir
+		v.add_child(_label(who, 18, Color(0.85, 0.82, 0.75), true))
 	v.add_child(_menu_button("Devam Et", func() -> void: pause_pressed.emit(), 20))
 	if testing:
 		v.add_child(_menu_button("Yeniden Oyna", func() -> void: test_action.emit("restart")))
+	else:
+		v.add_child(_menu_button("Yeniden Başlat (R)", func() -> void: restart_pressed.emit()))
 	v.add_child(_menu_button("Yetenekler", func() -> void: screens.skills(_selected, profile.level)))
 	v.add_child(_menu_button("Ayarlar", screens.settings))
 	v.add_child(_menu_button("Nasıl Oynanır", screens.help))

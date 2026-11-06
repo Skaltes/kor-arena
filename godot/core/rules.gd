@@ -33,7 +33,7 @@ static func calc_stats(ch: Dictionary, power: float = 1.0) -> Dictionary:
 		"max_hp": roundf((120.0 + prim["vit"] * 15.0 + level * 8.0 + bonus["hp"]) * power * 0.82 * float(c.get("hp_mult", 1.0))), # raunt kisa surer (kullanici istegi; eskisi 2,15 / 1,45 / 0,95); sinif dengesi hp_mult
 		"atk": roundf((6.0 + main_stat * 1.6 + bonus["atk"]) * power),
 		"def": roundf((prim["vit"] * 0.5 + bonus["def"]) * power),
-		"crit": minf(60.0, 5.0 + prim["agi"] * 0.3 + bonus["crit"]),
+		"crit": 0.0, # kritik yok (kullanici karari); ceviklik yalniz saldiri hizi verir
 		"aspd": float(c["aspd"]) * minf(1.8, 1.0 + prim["agi"] * 0.006),
 		"speed": c["speed"], "range": c["range"], "ranged": c["ranged"], "swing": c["swing"], "recover": c["recover"],
 	}
@@ -54,7 +54,6 @@ static func make_item(slot: String, level: int, rarity: int, cls: String, rng: R
 			stats["def"] = roundf(budget * 0.55)
 			stats["hp"] = roundf(budget * 1.2)
 		"accessory":
-			stats["crit"] = roundf(1.0 + rarity * 1.2)
 			stats["atk"] = roundf(budget * 0.35)
 	return {"slot": slot, "type": type, "rarity": rarity, "level": level, "stats": stats,
 		"variant": rng.randi_range(0, 3)}

@@ -156,6 +156,9 @@ func _ready() -> void:
 	_net.events_received.connect(_on_remote_events)
 	_net.skill_received.connect(_on_remote_skill)
 	_net.ready_received.connect(_on_rival_ready)
+	_net.pause_received.connect(_on_remote_pause)
+	_net.restart_received.connect(_on_remote_restart)
+	_hud.restart_pressed.connect(_restart_now)
 	_show_select()
 	var args := OS.get_cmdline_user_args()
 	if not args.is_empty():
@@ -275,7 +278,7 @@ func _begin(a: Dictionary, b: Dictionary, seed_value: int, my_team: int, title :
 		test.on_match_start()
 	_pred_id = ""
 	_net_target.clear()
-	_paused = false
+	_set_paused(false) # yeni mac: duraklatma penceresi de kapanir (yeniden baslatmada acik kalmasin)
 	_in_battle = true
 	_i_am_ready = false
 	_rival_ready = false
@@ -510,14 +513,29 @@ func _on_forfeit() -> void:
 		_battle.surrender(_me.team)
 
 
-func _set_paused(on: bool) -> void:
+func _set_paused(on: bool, who := "") -> void:
 	_paused = on
-	_hud.show_pause(on, _testing)
+	_hud.show_pause(on, _testing, who)
 
 
+## Canli mac (arkadaslarla) da duraklatilabilir (kullanici istegi): duraklatan taraf rakibe bildirir, oda sahibi savasi
+## ilerletmeyi keser; iki taraftan biri "Devam Et" deyince ikisinde de surer.
 func _on_pause() -> void:
-	if _mode == Mode.AI and _in_battle and not _battle.over:
+	if not _in_battle or _battle == null or _battle.over:
+		return
+	if not _paused and (_hold_t > 0.0 or _battle.pause_t > 0.0): # 3-2-1 geri sayim / raunt arasi: HUD sayaci gercek saatle akar, kayardi
+		return
+	if _mode == Mode.AI:
 		_set_paused(not _paused)
+	else:
+		_set_paused(not _paused, "Sen duraklattın" if not _paused else "")
+		_net.send_pause(_paused)
+
+
+func _on_remote_pause(on: bool) -> void:
+	if _mode == Mode.AI or not _in_battle or _battle == null or _battle.over:
+		return
+	_set_paused(on, "Rakip duraklattı" if on else "")
 
 
 ## Maç sonu ekranina gidenler: odul, mac sayilari, yeni basarimlar.
@@ -703,7 +721,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		n = 9
 	if n >= 0 and n < ids.size():
 		_use_skill(ids[n])
-	elif event.keycode == KEY_SPACE and _mode == Mode.AI:
+	elif event.keycode == KEY_R and not _testing:
+		_restart_now()
+	elif event.keycode == KEY_SPACE:
 		_on_pause()
 	elif event.keycode == KEY_P and _testing: # Test Modu: P ile duraklat / surdur
 		_on_pause()
@@ -715,7 +735,7 @@ func _on_escape() -> void:
 		return
 	if not _in_battle or _battle == null or _battle.over:
 		return
-	if _mode == Mode.AI:
+	if _mode == Mode.AI or _paused:
 		_on_pause()
 	else:
 		_hud.screens.online_menu(_cls)
@@ -1145,3 +1165,30 @@ func _update_camera() -> void:
 	_cam_d = lerpf(_cam_d, want_d, k)
 	_camera.position = Vector3(_cam_x, CAM_HEIGHT, _cam_d)
 	_camera.look_at(Vector3(_cam_x, CAM_LOOK_Y, 0))
+
+
+## Aninda yeniden baslatma (kullanici istegi): R tusu ya da duraklatma menusu. Bilgisayara karsi: ayni sinif ve asamayla
+## yeni mac (yarida birakilan mac sayilmaz, odul/yenilgi yok). Canli mac: oda sahibi hemen yeni maci baslatir,
+## katilan oda sahibine "restart" yollar; iki tarafta da ayni anda yeni mac baslar. Mac bitmisse tekrar oyna gibi calisir.
+func _restart_now() -> void:
+	if _battle == null or not _in_battle:
+		return
+	if _paused: # duraklatma penceresi acik kalmasin
+		_set_paused(false)
+	if _battle.over:
+		_on_rematch()
+		return
+	if _testing:
+		_start_test(_cls, _name)
+	elif _mode == Mode.AI:
+		_start_ai(_cls, _name)
+	elif _mode == Mode.HOST:
+		_start_host_match()
+	else:
+		_set_paused(false)
+		_net.send_restart()
+
+
+func _on_remote_restart() -> void:
+	if _mode == Mode.HOST and _in_battle and _battle != null:
+		_start_host_match()

@@ -14,9 +14,11 @@ signal state_received(data: PackedFloat32Array)
 signal events_received(list: Array)
 signal skill_received(id: String)
 signal ready_received(cls: String)
+signal pause_received(on: bool) # canli mac: rakip duraklatti / surdurdu
+signal restart_received # canli mac: katilan taraf maci hemen bastan baslatmak istedi
 signal role_set(is_host: bool) # hizli macta rol lobide belli olur
 
-const VERSION := 19
+const VERSION := 20
 const BROKERS: Array[String] = [
 	"wss://broker.emqx.io:8084/mqtt", # tests/test_broker.gd: 190 ms ve sabit, ama saniyede ~10 mesaj sinir
 	"wss://broker.hivemq.com:8884/mqtt", # sinirsiz ama yogunlukta kuyruk birikir: maclarda saniyelerce gecikme
@@ -438,6 +440,24 @@ func _deliver(item: Variant) -> void:
 		"ready":
 			if value is String and GameData.CLASSES.has(value):
 				ready_received.emit(value)
+		"restart":
+			if _role == Role.HOST:
+				restart_received.emit()
+		"pause":
+			if value is bool:
+				pause_received.emit(value)
+
+
+## Canli mac aninda yeniden baslatma: katilan oda sahibine sorar, oda sahibi yeni maci baslatir.
+func send_restart() -> void:
+	_reliable("restart", true)
+	_flush = maxf(_flush, FLUSH_EVERY - MIN_GAP)
+
+
+## Canli mac duraklatma (iki taraf da gonderebilir; guvenilir kanal, sirasi korunur).
+func send_pause(on: bool) -> void:
+	_reliable("pause", on)
+	_flush = maxf(_flush, FLUSH_EVERY - MIN_GAP)
 
 
 ## Tek pakette: onay + onaylanmamis mesajlar + oda sahibinin son savas durumu.

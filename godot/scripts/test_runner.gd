@@ -368,6 +368,43 @@ func _run_net_test(as_host: bool) -> void:
 			await get_tree().process_frame
 		_test_casts = 0
 		await get_tree().create_timer(1.5).timeout
+		if round_no == 0: # canli mac duraklatma: katilan Bosluk ile durdurur, iki tarafta da savas saati durmali
+			if not as_host:
+				while m._hold_t > 0.0 or m._battle.pause_t > 0.0: # geri sayimda duraklatma kapali
+					await get_tree().process_frame
+				await get_tree().create_timer(0.5).timeout
+				_press(KEY_SPACE)
+				await get_tree().create_timer(0.6).timeout
+				var c0: float = m._clock
+				await _snap("join_duraklat.png", 0.0)
+				await get_tree().create_timer(1.5).timeout
+				print("DURAKLAT join: durdu=%s saat ilerledi=%.2f" % [m._paused, m._clock - c0])
+				_press(KEY_SPACE)
+				await get_tree().create_timer(0.8).timeout
+				print("DURAKLAT join devam: durdu=%s" % m._paused)
+				var hp_before: float = m._battle.ents[0].hp + m._battle.ents[1].hp
+				var clock_before: float = m._clock
+				_press(KEY_R) # aninda yeniden baslatma: katilan ister, oda sahibi yeni maci baslatir
+				var rw := 0.0
+				while m._clock >= clock_before and rw < 5.0:
+					await get_tree().process_frame
+					rw += get_process_delta_time()
+				print("YENIDEN BASLAT join: yeni mac=%s saat %.1f -> %.1f" % [m._clock < clock_before, clock_before, m._clock])
+			else:
+				var w := 0.0
+				while not m._paused and w < 5.0:
+					await get_tree().process_frame
+					w += get_process_delta_time()
+				var c1: float = m._clock
+				var p1: Vector2 = m._battle.ents[1].pos
+				await get_tree().create_timer(1.0).timeout
+				await _snap("host_duraklat.png", 0.0)
+				print("DURAKLAT host: durdu=%s saat ilerledi=%.2f rakip kaydi=%.3f" % [m._paused, m._clock - c1, m._battle.ents[1].pos.distance_to(p1)])
+				w = 0.0
+				while m._paused and w < 5.0:
+					await get_tree().process_frame
+					w += get_process_delta_time()
+				print("DURAKLAT host devam: durdu=%s" % m._paused)
 		var keys: Array[Key] = [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0]
 		var i := 0
 		var shot_taken := false
@@ -426,6 +463,8 @@ func _make_portraits() -> void:
 		await get_tree().create_timer(0.7).timeout
 		if m._previews[0].rig != null:
 			m._previews[0].rig.weapon.visible = false # balyoz yuzu kapatmasin
+		elif cls == "brute" and m._previews[0]._hand != null:
+			m._previews[0]._hand.visible = false # Mixamo Titan: balyoz sag el yuvasinda, yuzu kapatmasin
 		var head := m._previews[0].head_position()
 		m._camera.position = head + Vector3(0.0, 0.03, 1.5)
 		m._camera.look_at(head + Vector3(0, 0.03, 0))

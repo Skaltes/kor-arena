@@ -14,7 +14,7 @@ const CLASSES: Dictionary = {
 		"color": Color(0.71, 0.28, 0.18),
 	},
 	"assassin": {
-		"name": "Berserker", "desc": "İki baltasıyla hızlı ve ölümcül. Kritik vuruş ve zehir.",
+		"name": "Berserker", "desc": "İki baltasıyla hızlı ve ölümcül. Hızlı vuruşlar ve zehir.",
 		"main": "agi", "hp_mult": 1.7, "range": 1.4, "aspd": 0.5, "speed": 5.4, "ranged": false, "swing": 0.65, "recover": 0.55,
 		"base": {"str": 6.0, "agi": 12.0, "int": 4.0, "vit": 8.4},
 		"grow": {"str": 1.2, "agi": 2.7, "int": 0.7, "vit": 1.45},
@@ -23,7 +23,7 @@ const CLASSES: Dictionary = {
 	},
 	"brute": {
 		"name": "Titan", "desc": "Ağır balyozuyla yavaş vurur ama her darbesi yıkıcıdır.",
-		"main": "str", "hp_mult": 0.80, "range": 1.9, "aspd": 0.3, "speed": 3.7, "ranged": false, "swing": 1.15, "recover": 1.05,
+		"main": "str", "hp_mult": 0.83, "range": 1.9, "aspd": 0.3, "speed": 3.7, "ranged": false, "swing": 1.15, "recover": 1.05,
 		"base": {"str": 16.5, "agi": 3.0, "int": 3.0, "vit": 14.0},
 		"grow": {"str": 4.8, "agi": 0.5, "int": 0.4, "vit": 4.3},
 		"skills": ["smash", "crush", "quake", "slam", "frost", "ruin", "icearm", "trample", "spin", "triple"], "weapons": ["sledge"],
@@ -62,7 +62,7 @@ const SKILLS: Dictionary = {
 	"wall": {"name": "Kalkan Duvarı", "unlock": 7, "cd": 9, "kind": "guard", "windup": 0.15, "dur": 1.1, "desc": "1,1 sn tüm hasarı engeller. Darbeden hemen önce basarsan saldırıyı yarıda keser."},
 	"verdict": {"name": "Kutsal Hüküm", "breaks": true, "down": true, "unlock": 8, "cd": 8, "kind": "melee", "range": 1.9, "mult": 2.0, "windup": 1.5, "desc": "Kutsal güçle sert bir darbe."},
 
-	"backstab": {"name": "Sırt Yaran", "breaks": true, "unlock": 1, "cd": 4, "kind": "melee", "range": 1.75, "mult": 1.6, "force_crit": true, "windup": 0.55, "desc": "Hep kritik."},
+	"backstab": {"name": "Sırt Yaran", "breaks": true, "unlock": 1, "cd": 4, "kind": "melee", "range": 1.75, "mult": 2.8, "windup": 0.55, "desc": "Sırta çok ağır bir darbe."},
 	"hamstring": {"name": "Topuk Kesiği", "unlock": 2, "cd": 7, "kind": "melee", "range": 1.75, "mult": 1.0, "windup": 0.35, "interrupt": true, "slow": {"pct": 0.5, "dur": 3.0}, "desc": "Çok hızlı. Rakibin hazırlığını KESER, yavaşlatır."},
 	"poison": {"name": "Zehirli Balta", "unlock": 3, "cd": 6, "kind": "melee", "range": 1.75, "mult": 0.95, "windup": 0.5, "dot": {"mult": 0.28, "dur": 7.0}, "desc": "7 sn zehir."},
 	"expose": {"name": "Zayıf Nokta", "breaks": true, "unlock": 5, "cd": 6, "kind": "melee", "range": 1.75, "mult": 1.9, "windup": 0.8, "desc": "Orta hızda sert bir kesik."},
@@ -75,7 +75,7 @@ const SKILLS: Dictionary = {
 	"crush": {"name": "Kemik Kırma", "breaks": true, "unlock": 2, "cd": 7, "kind": "melee", "range": 2.2, "mult": 0.7, "windup": 0.7, "desc": "Orta hızda sert bir darbe."},
 	"quake": {"name": "Yer Sarsıntısı", "unlock": 3, "cd": 10, "kind": "aoe_self", "radius": 3.6, "mult": 1.0, "stun": 0.95, "windup": 0.5, "desc": "Rakibi 0,95 sn sersemletir, hazırlığını keser."},
 	"slam": {"name": "Sıçrayış Darbesi", "breaks": true, "unlock": 5, "cd": 12, "kind": "melee", "range": 2.2, "mult": 0.9, "windup": 0.85, "desc": "Sıçrayıp balyozu yukarıdan indirir. Rakibin hazırlığını keser."}, # kullanici: Girtlak Kavrama kaldirildi, yerine Yikimin eski ziplayarak vurma hareketi
-	"frost": {"name": "Buz Mührü", "unlock": 6, "cd": 12, "kind": "melee", "range": 6.6, "mult": 0.35, "windup": 1, "freeze": 2.0, "desc": "Uzun büyü. Rakip hazırlık bitmeden bir yetenekle vurup bozamazsa 2 sn donar: hemen ardından Yıkım yetişir."},
+	"frost": {"name": "Buz Mührü", "unlock": 6, "cd": 12, "kind": "melee", "range": 6.6, "mult": 0.35, "windup": 1, "freeze": 2.0, "unblockable": true, "desc": "Uzun büyü. Siperle engellenemez, kaçılamaz: rakip hazırlık bitmeden Titanı bir yetenekle vurup bozamazsa 2 sn donar."},
 	"ruin": {"name": "Yıkım", "breaks": true, "down": true, "unlock": 8, "cd": 14, "kind": "melee", "range": 2.2, "mult": 1.8, "windup": 1, "desc": "En uzun hazırlık, en büyük darbe. Kesilebilir!"},
 	"icearm": {"name": "Buz Kolu", "unlock": 7, "cd": 12, "kind": "guard", "windup": 0.15, "dur": 0.8, "counter": true, "freeze": 0.7, "desc": "0,8 sn buzdan bir kalkan kaldırır, tüm hasarı engeller. Rakip bu sırada vurursa donar."},
 	"trample": {"name": "Ezici Hamle", "unlock": 8, "cd": 11, "kind": "melee", "range": 2.2, "mult": 1.0, "windup": 0.45, "push": 0.25, "reel": 0.8, "after": 0.3, "slow": {"pct": 0.4, "dur": 4.0}, "desc": "Rakibi iter, 0,8 sn afallatır, 4 sn %40 yavaşlatır. Hemen ardından başka yetenek kullanabilirsin."},

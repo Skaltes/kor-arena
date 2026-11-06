@@ -46,6 +46,8 @@ func _try_parry(b: Battle) -> void:
 	var foe := _e.target
 	if foe == null or not _e.alive:
 		return
+	if foe.cast_t > 0.0 and GameData.SKILLS.get(foe.cast_id, {}).get("unblockable", false):
+		return # engellenemez buyuye siper acmak bosuna
 	var left := foe.cast_t if foe.cast_t > 0.0 else foe.swing
 	if left <= 0.0 or left > 0.3:
 		_judged = false

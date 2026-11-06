@@ -456,8 +456,9 @@ func _buffed(e: Ent, key: String) -> float:
 
 ## Sans eseri kacma YOK (kullanici karari): vurus menzilde ve siperle karsilanmadiysa hep isabet eder.
 func _hit(src: Ent, dst: Ent, mult: float, opt: Dictionary) -> bool:
-	var crit: bool = opt.get("force_crit", false) or rng.randf() * 100.0 < float(src.s["crit"])
-	var dmg := _buffed(src, "atk") * mult * (0.92 + rng.randf() * 0.16) * (1.75 if crit else 1.0)
+	# KRITIK ve hasar oynamasi YOK (kullanici karari: "her skill ayni vursun, iyi oynayan kazansin"): ayni vurus hep ayni hasar
+	var crit := false
+	var dmg := _buffed(src, "atk") * mult
 	var def := _buffed(dst, "def")
 	dmg *= 1.0 - def / (def + 40.0 + float(dst.s["level"]) * 6.0)
 	_last_dmg = dmg
@@ -593,7 +594,9 @@ func _land_delayed(d: Dictionary) -> void:
 	if sk.get("grab", false) and tgt.cast_t <= 0.0: # kavrama yalnizca hazirlanan rakibi yakalar; bekleme suresi aynen isler
 		events.append({"t": "whiff", "ent": src.id, "skill": d["skill"]})
 		return
-	if tgt.alive and src.pos.distance_to(tgt.pos) <= float(sk["range"]) * 1.4 and not _guarded(src, tgt):
+	# Engellenemez (Buz Muhru, kullanici karari): siper/Buz Kolu ve uzaklasma ise yaramaz; tek cozum hazirlikta Titani vurup bozmak
+	var sure: bool = sk.get("unblockable", false)
+	if tgt.alive and (sure or (src.pos.distance_to(tgt.pos) <= float(sk["range"]) * 1.4 and not _guarded(src, tgt))):
 		if _hit(src, tgt, sk["mult"], {"force_crit": sk.get("force_crit", false), "skill": d["skill"]}):
 			_riders(src, tgt, sk)
 			_stagger(src, tgt, sk)

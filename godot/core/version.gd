@@ -1,7 +1,7 @@
 class_name Version
 ## Oyunun surumu. tools\yayinla.ps1 her yayinda BUILD'i artirir; acilis ekrani GitHub'daki surumle karsilastirir.
 
-const BUILD := 24
+const BUILD := 25
 const REPO := "Skaltes/kor-arena"
 static var force_phone := false # yalnizca gelistirici testi: telefon arayuzunu bilgisayarda dener
 

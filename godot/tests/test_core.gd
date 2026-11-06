@@ -422,8 +422,19 @@ func _frost_check() -> bool:
 		c.tick()
 	var broken: bool = not c.has_fx(c.ents[1], "freeze") and c.ents[0].cast_t <= 0.0 and c.ents[0].cds["frost"] > float(GameData.SKILLS["frost"]["cd"]) * 0.8
 	c.release()
-	print("Buz Muhru: dondu=%s cozuldu=%s bozuldu=%s" % [frozen, thawed, broken])
-	return frozen and thawed and broken
+	var g := _pair("brute", "warrior") # siper engellemez (kullanici karari): Kalkan Duvari acik olsa da donar
+	g.command({"ent": 0, "type": "skill", "skill": "frost"})
+	for i in int(0.8 / Battle.STEP):
+		g.tick()
+	g.command({"ent": 1, "type": "skill", "skill": "wall"})
+	var walled := false
+	for i in int(0.6 / Battle.STEP):
+		g.tick()
+		walled = walled or g.ents[1].guard_t > 0.0
+	var through: bool = walled and g.has_fx(g.ents[1], "freeze")
+	g.release()
+	print("Buz Muhru: dondu=%s cozuldu=%s bozuldu=%s siper=%s sipere ragmen dondu=%s" % [frozen, thawed, broken, walled, through])
+	return frozen and thawed and broken and through
 
 
 ## Buz Kolu: acikken inen yetenek de duz vurus da engellenir ve saldiran donar (kullanici istegi).
