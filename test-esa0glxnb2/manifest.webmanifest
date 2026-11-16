@@ -1,0 +1,13 @@
+{
+  "name": "Kor Arena Test",
+  "short_name": "KA Test",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0d0806",
+  "theme_color": "#0d0806",
+  "icons": [
+    {"src": "ikon192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "ikon512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
